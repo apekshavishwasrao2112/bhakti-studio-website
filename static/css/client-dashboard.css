@@ -1,0 +1,83 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+/* BACKGROUND */
+.music-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('music-bg.jpg') no-repeat center center/cover;
+    filter: blur(3px);
+    z-index: -1;
+}
+
+/* MAIN CONTENT */
+.content {
+    padding: 30px;
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.header h1 {
+    font-size: 42px;
+    margin-bottom: 5px;
+}
+
+/* BOOK BUTTON */
+.book-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.book-btn {
+    padding: 15px 30px;
+    background: #e91e63;
+    color: white;
+    border: none;
+    border-radius: 30px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+.book-btn:hover {
+    background: #c2185b;
+}
+
+/* SECTIONS */
+.section {
+    background: rgba(0,0,0,0.6);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+}
+
+.section h2 {
+    margin-bottom: 15px;
+}
+
+/* DEMO CARDS */
+.demo-card {
+    margin-bottom: 15px;
+}
+
+/* YOUTUBE */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+
+iframe {
+    width: 100%;
+    height: 200px;
+    border-radius: 10px;
+}

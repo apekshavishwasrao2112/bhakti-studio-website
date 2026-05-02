@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Bhakti Studio</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.ico.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="{{ url_for('static', filename='images/LogoBhakti.png') }}" alt="Bhakti Studio" class="sidebar-logo">
+            <h3>Bhakti Studio</h3>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="/bhakti-secure-admin-portal-84729/dashboard" class="nav-link active">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="/bhakti-secure-admin-portal-84729/website" class="nav-link">
+                <i class="fas fa-globe"></i>
+                <span>Website</span>
+            </a>
+            <a href="/bhakti-secure-admin-portal-84729/election" class="nav-link">
+                <i class="fas fa-vote-yea"></i>
+                <span>Election</span>
+            </a>
+            <a href="/bhakti-secure-admin-portal-84729/campaign" class="nav-link">
+                <i class="fas fa-bullhorn"></i>
+                <span>Campaign</span>
+            </a>
+            <a href="/bhakti-secure-admin-portal-84729/loudspeaker" class="nav-link">
+                <i class="fas fa-volume-up"></i>
+                <span>Loudspeaker</span>
+            </a>
+            <a href="/bhakti-secure-admin-portal-84729/production" class="nav-link">
+                <i class="fas fa-music"></i>
+                <span>Production</span>
+            </a>
+            <a href="/bhakti-secure-admin-portal-84729/events" class="nav-link">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Events</span>
+            </a>
+            <a href="/bhakti-secure-admin-portal-84729/social" class="nav-link">
+                <i class="fas fa-share-alt"></i>
+                <span>Social Media</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="/bhakti-secure-admin-portal-84729/logout" class="logout-btn">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Dashboard</h1>
+            </div>
+
+            <div class="header-right">
+                <div class="datetime" id="datetime"></div>
+                {% if db_status %}
+                <div class="db-status" style="margin-right: 15px; padding: 5px 10px; border-radius: 5px; font-size: 12px;  {% if db_status == 'Connected' %}
+                        background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+                    {% elif db_status == 'Database not connected' %}
+                        background-color: #fff3cd; color: #856404; border: 1px solid #ffeaa7;
+                    {% else %}
+                        background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
+                    {% endif %}">
+                    <i class="fas fa-database"></i>
+                    {{ db_status }}
+                </div>
+                {% endif %}
+                <div class="profile">
+                    <i class="fas fa-user-circle"></i>
+                    <span>Welcome Admin</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card total">
+                <div class="stat-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ total_bookings }}</h3>
+                    <p>Total Bookings</p>
+                </div>
+            </div>
+
+            <div class="stat-card pending">
+                <div class="stat-icon">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ pending_bookings }}</h3>
+                    <p>Pending</p>
+                </div>
+            </div>
+
+            <div class="stat-card confirmed">
+                <div class="stat-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ confirmed_bookings }}</h3>
+                    <p>Confirmed</p>
+                </div>
+            </div>
+
+            <div class="stat-card completed">
+                <div class="stat-icon">
+                    <i class="fas fa-check-double"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>{{ completed_bookings }}</h3>
+                    <p>Completed</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bookings Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h2>📋 Recent Bookings</h2>
+                <div class="table-actions">
+                    <input type="text" id="searchInput" placeholder="Search bookings..." class="search-input">
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="bookingsTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Service</th>
+                            <th>Booking Date</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                   <tbody>
+{% for booking in bookings %}
+<tr data-status="{{ booking[5] }}">
+    <td>{{ booking[0] }}</td>
+    <td>{{ booking[1] }}</td>
+
+    <td>
+        <a href="#" 
+           onclick="openWhatsApp('{{ booking[2] }}', '{{ booking[1] }}')" 
+           class="phone-link">
+            {{ booking[2] }}
+        </a>
+    </td>
+
+    <td>{{ booking[3] }}</td>
+    <td>{{ booking[4] if booking[4] else 'N/A' }}</td>
+
+    <td>
+        <span class="status-badge status-{{ booking[5].lower() }}">
+            {{ booking[5] }}
+        </span>
+    </td>
+
+    <td>
+        {{ booking[6] if booking[6] else 'N/A' }}
+    </td>
+
+    <td class="actions">
+
+        {% if booking[5] == 'Pending' %}
+
+            <button onclick="updateStatus({{ booking[0] }}, 'Confirmed', '{{ booking[2] }}', '{{ booking[1] }}')" class="action-btn confirm">
+                Confirm
+            </button>
+
+            <button onclick="updateStatus({{ booking[0] }}, 'Rejected')" class="action-btn reject">
+                Reject
+            </button>
+
+        {% elif booking[5] == 'Confirmed' %}
+
+            <button onclick="updateStatus({{ booking[0] }}, 'Completed')" class="action-btn complete">
+                Complete
+            </button>
+
+        {% elif booking[5] == 'Completed' %}
+
+            <button onclick="deleteBooking({{ booking[0] }})" class="action-btn delete">
+                Delete
+            </button>
+
+        {% endif %}
+
+    </td>
+</tr>
+{% endfor %}
+</tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageToast" class="toast">
+        <div class="toast-content">
+            <i class="fas fa-check-circle"></i>
+            <span id="toastMessage"></span>
+        </div>
+    </div>
+
+    <script>
+        // Update datetime
+        function updateDateTime() {
+            const now = new Date();
+            const datetime = now.toLocaleDateString() + ' ' + now.toLocaleTimeString();
+            document.getElementById('datetime').textContent = datetime;
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Sidebar toggle
+        document.getElementById('menuToggle').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#bookingsTable tbody tr');
+
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Update booking status
+      async function updateStatus(id, status, phone, name){
+
+            const res = await fetch(`/update-status/${id}/${status}`, {
+                method: "POST"
+            });
+
+            const data = await res.json();
+
+            if(data.success){
+
+                if(status === "Confirmed"){
+                    openWhatsApp(phone, name);
+                }
+
+                location.reload();
+            }
+        }
+
+        async function deleteBooking(id){
+
+        let confirmDelete = confirm("Are you sure to delete this booking?");
+
+        if(!confirmDelete) return;
+
+        const res = await fetch(`/delete-booking/${id}`, {
+            method: "POST"
+        });
+
+        const data = await res.json();
+
+        if(data.success){
+            alert("Deleted successfully");
+            location.reload();
+        }
+    }
+
+       function openWhatsApp(phone, name){
+
+            // Remove all non-numbers
+            let cleanPhone = phone.replace(/\D/g, "");
+
+            // Ensure 10 digit number
+            if(cleanPhone.length === 10){
+                cleanPhone = "91" + cleanPhone;
+            }
+
+            // Detect Marathi
+            let isMarathi = /[\u0900-\u097F]/.test(name);
+
+            let message;
+
+            if(isMarathi){
+                message = `🙏 धन्यवाद ${name}!
+
+        Bhakti Studio मध्ये आपले बुकिंग कन्फर्म झाले आहे 🎙
+
+        📍 लोकेशन: https://www.google.com/maps?q=19.1138352,74.1761465  
+        📞 संपर्क: 9146940518  
+
+        कृपया लवकर भेट द्या 🙏`;
+            } else {
+                message = `Thank you ${name}!
+
+        Your booking is confirmed at Bhakti Studio 🎙
+
+        📍 Location: https://www.google.com/maps?q=19.1138352,74.1761465  
+        📞 Contact: 9146940518  
+
+        Please visit soon!`;
+            }
+
+          let url = "https://wa.me/" + cleanPhone + "?text=" + encodeURIComponent(message);
+            window.open(url, "_blank");
+            // DEBUG (IMPORTANT)
+            console.log(url);
+
+            window.open(url, "_blank");
+        }
+
+        // Toast notifications
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('messageToast');
+            const toastMessage = document.getElementById('toastMessage');
+
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(event) {
+            const sidebar = document.querySelector('.sidebar');
+            const menuToggle = document.getElementById('menuToggle');
+
+            if (!sidebar.contains(event.target) && !menuToggle.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

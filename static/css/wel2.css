@@ -1,0 +1,145 @@
+  body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .hero {
+            background: url("{{ url_for('static', filename='images/welimg.jpg') }}") no-repeat center center/cover;
+            height: 100vh;
+            position: relative;
+            color: white;
+        }
+
+        .overlay {
+            background: rgba(0, 0, 0, 0.65);
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            top: 40%;
+            transform: translateY(-40%);
+        }
+
+        .cards-section {
+            background: #f8f9fa;
+            padding: 60px 20px;
+        }
+
+        .card {
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        footer {
+            background: #111;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .insta-icon {
+        color: #ea234b;
+        font-size: 40px;
+       font-size: 25px;
+    }
+        .yt-icon {
+        color: #f00e0e;
+        font-size: 40px;
+       font-size: 25px;
+    }
+    .blinking-btn {
+    font-family: emoji;
+    animation: glowEffect 1s infinite alternate;
+    }
+
+    @keyframes glowEffect {
+        from {
+            box-shadow: 0 0 5px #ffc107;
+        }
+        to {
+            box-shadow: 0 0 20px #ff9800;
+        }
+    }
+
+    /*------------ section 2 ------------ Demo*/
+
+/* Section Background */
+.cards-section {
+    padding: 80px 0;
+}
+
+/* Remove link styling */
+.card-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Card Styling */
+.demo-card {
+    border-radius: 18px;
+    padding: 30px;
+    transition: all 0.4s ease;
+    cursor: pointer;
+    background: white;
+}
+
+/* Hover Animation */
+.demo-card:hover {
+    transform: translateY(-12px) scale(1.04);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
+
+/* Click Effect */
+.demo-card:active {
+    transform: scale(0.96);
+}
+
+/* Title Styling */
+.demo-card .card-title {
+    font-weight: 600;
+    font-size: 18px;
+    transition: color 0.3s ease;
+}
+
+/* Title Hover Color */
+.demo-card:hover .card-title {
+    color: #ffc107;
+}
+
+/* Smooth Glow Pulse */
+.demo-card {
+    animation: glowPulse 3s infinite alternate;
+}
+
+@keyframes glowPulse {
+    from {
+        box-shadow: 0 0 8px rgba(255,193,7,0.2);
+    }
+    to {
+        box-shadow: 0 0 25px rgba(255,193,7,0.5);
+    }
+}
+
+
+.demo-heading {
+    font-weight: 700;
+    background: linear-gradient(90deg, #ffc107, #ff9800, #ff5722);
+    
+    background-clip: text;              /* Standard property */
+    -webkit-background-clip: text;      /* Chrome / Safari support */
+    
+    color: transparent;                 /* Standard way */
+    -webkit-text-fill-color: transparent;
+}

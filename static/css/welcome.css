@@ -1,0 +1,209 @@
+/* ----------------------welcome page style------------------------ */
+body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.video-background {
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%; 
+  height: 100%;
+ overflow: hidden;
+ z-index: -1;
+  
+}
+.bg-video{
+  width: 100%; 
+  height: 100%;
+  object-fit: cover;
+  filter: blur(1.9px);
+
+}
+
+.logo-container{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+
+}
+.logo img{
+  width: 190px;
+  
+  height: auto;
+  cursor: pointer;
+ 
+}
+
+.glow-effect{
+  box-shadow:-47px -32px 25px 0px white;
+  transform: scale(1.1);
+}
+
+#log{
+ transition: all 0.5 ease;
+}
+  
+
+#logo-text{
+
+  margin-top: 20px;
+  color: aliceblue;
+
+  font-size: 50px;
+  font-style: italic;
+  font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+
+}
+/* ----------------------wel2 page style------------------------ */
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.background {
+  background-image: url('welbg2.jpg');
+  background-size: cover;
+
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  filter:blur(1.9px);
+  z-index: -1;
+}
+ 
+ .Loginbox{
+  width: 350px;
+  height: 500px;
+  border: 1px solid rgb(147, 143, 143);
+  border-radius: 18px;
+  background-color: white;
+  color: black;
+  margin: 60px;
+ }
+  .Loginbox img{
+    margin: 9px 0px 0px 130px;
+  }
+#plog1{
+  font-size: 20px;
+  text-align: center;
+  font-weight: bold;
+  font-family:Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+#plog2{
+  color: rgb(112, 106, 106);
+  text-align: center;
+  margin-top: -10px;
+}
+.in1{
+  margin: 10px 0px 0px 30px;
+  padding: 6px;
+  width: 280px;
+  border: 1px solid gray;
+  border-radius: 5px;
+}
+.check1{
+  display: inline-block
+}
+#checkbox{
+  margin: 10px;
+  font-size: 20px;
+  padding: 20px;
+}
+
+/* -------------------login page of wel2.html---------------------*/
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+}
+
+.login-container {
+    width: 350px;
+    margin: 100px auto;
+    padding: 30px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.login-container h2 {
+    margin-bottom: 5px;
+}
+
+.login-container p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.login-container label {
+    display: block;
+    text-align: left;
+    margin-bottom: 5px;
+    font-size: 14px;
+}
+
+.login-container input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.login-container button {
+    width: 100%;
+    padding: 10px;
+    background: #222;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.login-container button:hover {
+    background: #444;
+}
+
+
+
+
+
+
+
+
+
+
+
+@media (max-width:600){
+  .bg-video{
+    object-fit: contain;
+  }
+}
+
+@media (max-width:700px){
+ .logo img{
+  width: 120px;
+}
+}
+
+@media (max-width:700px){
+ #logo-text{
+  font-size: 29px;
+  margin-top: 30px;
+}
+}
+

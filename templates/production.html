@@ -1,0 +1,93 @@
+{% extends "election.html" %}
+
+{% block title %} Professional Music Production {% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+            <img src="{{ url_for('static', filename='images/LogoBhakti.png') }}" alt="Logo" class="brand-logo">
+            BHAKTI STUDIO
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button> 
+         
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/election">Election</a></li>
+                <li class="nav-item"><a class="nav-link" href="/campaign">Campaign</a></li>
+                <li class="nav-item"><a class="nav-link" href="/loudspeaker">Loudspeaker</a></li>
+                <li class="nav-item"><a class="nav-link active-link" href="/pro">Production</a></li>
+                <li class="nav-item"><a class="nav-link" href="/events">Events</a></li>
+                <li class="nav-item"><a class="nav-link" href="/dia">Dialogue</a></li>
+                <li class="nav-item"><a class="nav-link" href="/social">About</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h2 class="page-title"> 🎙️ Professional Music Production </h2>
+        <p class="text-white-50">High-quality professional music production for your political victory.</p>
+    </div>
+    
+    <div class="row g-4">
+        {% set production_videos = [
+            ('IeDWsEAgL_s', '01 | Bhakti Studio'),
+            ('6cWEmRdSKUk', '02 | Bhakti Studio |'),
+            ('nU-aXzsAZP0', '03 | Bhakti Studio |'),
+            ('a31tuStOcWQ', '04 | Bhakti Studio |'),
+            ('Bq2ORyoEfxg', '05 | Bhakti Studio |')
+        ] %}
+
+        {% for id, title in production_videos %}
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card video-card shadow-sm">
+                <div class="video-container" onclick="playVideo(this, '{{ id }}')" 
+                     style="position: relative; width: 100%; height: 200px; background: #000; cursor: pointer;">
+                    <img src="https://img.youtube.com/vi/{{ id }}/hqdefault.jpg" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-bottom: 3px solid #ffc107;">
+                    <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 50px; color: #ffc107; opacity: 0.8; transition: 0.3s;">▶</div>
+                </div>
+                <div class="card-body text-center">
+                    <p class="fw-semibold mb-0" style="color: #fff; font-size: 0.95rem;">{{ title }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+    let currentActivePlayer = null;
+
+    function playVideo(container, videoId) {
+        // 1. If another video is playing, stop it and restore its thumbnail
+        if (currentActivePlayer && currentActivePlayer !== container) {
+            const oldId = currentActivePlayer.getAttribute('data-active-id');
+            currentActivePlayer.innerHTML = `
+                <img src="https://img.youtube.com/vi/${oldId}/hqdefault.jpg" style="width: 100%; height: 100%; object-fit: cover; border-bottom: 3px solid #ffc107;">
+                <div class="play-btn" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 50px; color: #ffc107; opacity: 0.8;">▶</div>
+            `;
+        }
+
+        // 2. Set the current container as active
+        currentActivePlayer = container;
+        container.setAttribute('data-active-id', videoId);
+
+        // 3. Replace thumbnail with YouTube Iframe
+        container.innerHTML = `
+            <iframe 
+                src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                allowfullscreen 
+                style="width:100%; height:100%;">
+            </iframe>
+        `;
+    }
+</script>
+{% endblock %}

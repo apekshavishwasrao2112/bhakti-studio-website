@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhakti Studio</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.ico.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/welcome.css') }}">
+
+
+</head>
+<body>
+ <div class="video-background ">
+<video autoplay muted loop class="bg-video">
+    <source src="{{ url_for('static', filename='videos/music.mp4') }}" type="video/mp4">
+</video>
+
+
+ </div>
+ <div class="logo-container">
+ <div class="logo"><a href="{{url_for('logo_page')}}" target="_blank"><img src="{{ url_for('static', filename='images/LogoBhakti.png') }}" id="log" alt="" width="200px"></a></div>
+ <div id="logo-text">Where Music Meets Soul. </div>
+ </div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    
+</body>
+</html>

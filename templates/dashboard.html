@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard | Bhakti Studio</title>
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<div class="container">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <h2>Bhakti Studio</h2>
+
+        <a href="#" class="active">Dashboard</a>
+        <a href="bookings.html">Bookings</a>
+        <a href="add-client.html">Add Client</a>
+        <a href="upload-demo.html">Upload Demo</a>
+        <a href="welcome.html" class="logout">Logout</a>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- TOP BAR -->
+        <div class="topbar">
+            <h3>Admin Dashboard</h3>
+        </div>
+
+        <!-- CARDS -->
+        <div class="cards">
+            <div class="card">
+                <h4>Today’s Bookings</h4>
+                <p>3</p>
+            </div>
+            <div class="card">
+                <h4>This Month</h4>
+                <p>18</p>
+            </div>
+            <div class="card">
+                <h4>Total Clients</h4>
+                <p>42</p>
+            </div>
+            <div class="card">
+                <h4>Pending Requests</h4>
+                <p>2</p>
+            </div>
+        </div>
+
+        <!-- TODAY BOOKINGS -->
+        <div class="section">
+            <h3>Today’s Bookings</h3>
+            <table>
+                <tr>
+                    <th>Time</th>
+                    <th>Name</th>
+                    <th>Mobile</th>
+                    <th>Status</th>
+                </tr>
+                <tr>
+                    <td>10:00 – 11:00</td>
+                    <td>Rahul</td>
+                    <td>9876543210</td>
+                    <td class="confirmed">Confirmed</td>
+                </tr>
+                <tr>
+                    <td>12:00 – 01:00</td>
+                    <td>Sneha</td>
+                    <td>8765432109</td>
+                    <td class="pending">Pending</td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>

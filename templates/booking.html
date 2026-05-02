@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking - Bhakti Studio</title>
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.ico.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+</head>
+
+<body>
+
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop class="bg-video">
+            <source src="{{ url_for('static', filename='videos/music.mp4') }}" type="video/mp4">
+        </video>
+    </div>
+
+    <!-- ✅ Success Modal -->
+    <div id="successModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="success-icon">✅</div>
+            <h2>Booking Successful!</h2>
+            <p>Your booking has been confirmed. We'll contact you soon!</p>
+            <button onclick="redirectToHome()" class="home-btn">Back to Home</button>
+        </div>
+    </div>
+
+    <!-- Booking Form -->
+    <div class="booking-container">
+        <div class="blur-form">
+            <h2 id="title">🎵 Book Your Session</h2>
+
+            <!-- Language Buttons -->
+            <div class="lang-buttons">
+                <button type="button" class="lang-btn active" onclick="setLang(event, 'en')">English</button>
+                <button type="button" class="lang-btn" onclick="setLang(event, 'mr')">मराठी</button>
+            </div>
+
+            <form id="bookingForm" method="POST" action="/booking">
+
+                <div class="form-group">
+                    <input type="text" name="name" id="name" placeholder="Your Name" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="tel" name="phone" id="phone" placeholder="Mobile Number" required>
+                </div>
+
+                <div class="form-group">
+                    <select  name="service" id="service" required>
+                        <option value="" >Select Service</option>
+                        <option value="song">🎵 Song Recording</option>
+                        <option value="reel">🎬 Video Reel</option>
+                        <option value="announcement">📣 Announcement</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <input type="date" name="booking_date" id="booking_date" required>
+                </div>
+
+                <button type="submit" id="submitBtn" class="submit-btn">Book Now</button>
+
+            </form>
+        </div>
+    </div>
+
+    <script>
+
+        // ✅ FIXED: event parameter added
+        function setLang(event, lang) {
+            const buttons = document.querySelectorAll('.lang-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            event.target.classList.add('active');
+
+            if (lang === "mr") {
+                document.getElementById("title").innerText = "🎵 तुमची सत्र बुक करा";
+                document.getElementById("name").placeholder = "तुमचे नाव";
+                document.getElementById("phone").placeholder = "मोबाईल नंबर";
+            } else {
+                document.getElementById("title").innerText = "🎵 Book Your Session";
+                document.getElementById("name").placeholder = "Your Name";
+                document.getElementById("phone").placeholder = "Mobile Number";
+            }
+        }
+
+        function showSuccessModal() {
+            const modal = document.getElementById('successModal');
+            modal.style.display = 'flex';
+
+            setTimeout(() => {
+                modal.classList.add('show');
+            }, 100);
+        }
+
+        function redirectToHome() {
+            window.location.href = '/logo';
+        }
+
+        // ✅ MAIN FIX: detect success in URL
+        window.onload = function () {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            if (urlParams.get('success') === 'true') {
+                showSuccessModal();
+
+                // ✅ Remove success param after showing modal (clean URL)
+                window.history.replaceState({}, document.title, "/booking");
+            }
+        };
+
+        // ✅ Loading state on submit
+        document.getElementById('bookingForm').addEventListener('submit', function() {
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '⏳ Booking...';
+            submitBtn.disabled = true;
+        });
+
+    </script>
+
+</body>
+</html>

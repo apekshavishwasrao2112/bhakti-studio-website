@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Hub | Bhakti Studio & Avishkar Vishwasrao</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --accent: #ffc107;
+            --glass: rgba(255, 255, 255, 0.07);
+            --glass-border: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Full Screen Parallax Sections */
+        .parallax-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            padding: 80px 0;
+            position: relative;
+        }
+
+        /* Studio Backgrounds */
+        .bg-studio-1 { background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.7)), url("{{ url_for('static', filename='images/avi1.jpeg') }}"); }
+        .bg-studio-2 { background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.7)), url("{{ url_for('static', filename='images/avi3.jpeg') }}"); }
+        .bg-studio-3 { background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.7)), url("{{ url_for('static', filename='images/avi4.jpeg') }}"); }
+
+        /* Navigation Overlay */
+        .nav-overlay {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px;
+            z-index: 1000;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        .nav-overlay a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 1px;
+            transition: 0.3s;
+        }
+
+        .nav-overlay a:hover { color: var(--accent); }
+
+        /* Premium Glass Container */
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 30px;
+            padding: 40px;
+            width: 100%;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        /* Video Demo Containers */
+        .demo-box {
+            border-radius: 15px;
+            overflow: hidden;
+            border: 1px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(255, 193, 7, 0.2);
+            transition: 0.4s;
+        }
+        .demo-box:hover { transform: scale(1.03); }
+
+        /* Icon Styles */
+        .social-logo {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.3));
+        }
+
+        .section-header h2 {
+            font-weight: 800;
+            font-size: 2.5rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        /* WhatsApp Button Custom */
+        .wa-floating {
+            background: #25D366;
+            color: #fff;
+            padding: 18px 35px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+        }
+
+        .wa-floating:hover {
+            background: #128C7E;
+            transform: translateY(-5px);
+            color: #fff;
+            box-shadow: 0 15px 30px rgba(37, 211, 102, 0.5);
+        }
+
+        @media (max-width: 768px) {
+            .parallax-section { height: auto; background-attachment: scroll; }
+            .section-header h2 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="nav-overlay">
+        <a href="/election">HOME</a>
+        <a href="#youtube">YOUTUBE</a>
+        <a href="#instagram">INSTAGRAM</a>
+        <a href="#contact" style="color: var(--accent);">HIRE US</a>
+    </nav>
+
+  <section id="youtube" class="parallax-section bg-studio-1">
+    <div class="container">
+       <div class="glass-panel" data-aos="fade-up">
+            <div class="text-center section-header mb-5">
+                <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" class="brand-thumb"  width="45" height="45"  alt="Avishkar Vishwasrao">
+                <h2><img src="{{ url_for('static', filename='images/LogoBhakti.png') }}" alt="Logo" class="brand-logo" width="45" height="45" >Bhakti Studio </h2>
+                <p class="text-white-50">Studio Life, Music Production & Creative Vlogs</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="demo-box">
+                        <div class="ratio ratio-16x9">
+                            <iframe src="https://www.youtube.com/embed/aUMBf4rldM0" title="Personal Demo 1" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <h5 class="mt-3 text-center text-warning">Ganpati Yenar | Offical Video Song | Keshav Dilse | Bhakti Studio</h5>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="demo-box">
+                        <div class="ratio ratio-16x9">
+                            <iframe src="https://www.youtube.com/embed/202B8ZjvOf4" title="Personal Demo 2" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <h5 class="mt-3 text-center text-warning">Tu Mothya Bapachi Lek me lekaru| Avishkar Vishwasrao | Bhakti Studio |</h5>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="https://www.youtube.com/@avishkarvishwasrao" target="_blank" class="btn btn-outline-warning px-4 py-2">Visit Channel</a>
+            </div>
+        </div>
+
+
+
+        <div class="glass-panel mb-5" data-aos="fade-up">
+            <div class="text-center section-header mb-2">
+              <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" class="brand-thumb" width="45" height="45"  alt="Voice Over Marathi">
+                <h2> <img src="{{ url_for('static', filename='images/LogoBhakti.png') }}" alt="Logo" class="brand-logo" width="45" height="45" >Voice Over Marathi</h2>
+                <p class="text-white-50">Professional Marathi Scripts & Political Narrations</p>
+            </div>
+            
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="demo-box">
+                        <div class="ratio ratio-16x9">
+                            <iframe src="https://www.youtube.com/embed/V6wBt3sIHY8" title="VO Demo 1" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <h5 class="mt-3 text-center text-warning">आमदार प्रचार गीत | Bhakti Studio</h5>
+                </div>
+                <div class="col-md-6">
+                    <div class="demo-box">
+                        <div class="ratio ratio-16x9">
+                            <iframe src="https://www.youtube.com/embed/w1fAlj_Atg4" title="VO Demo 2" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                    <h5 class="mt-3 text-center text-warning">विधान सभा | Voice Over Marathi</h5>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <a href="https://www.youtube.com/@voiceovermarathi4641" target="_blank" class="btn btn-outline-warning px-4 py-2">Visit Channel</a>
+            </div>
+        </div>
+    </div>
+
+</section>
+
+
+    <section id="instagram" class="parallax-section bg-studio-2">
+        <div class="container">
+            <div class="glass-panel" data-aos="fade-right" style="background: rgba(0,0,0,0.4);">
+                <div class="row align-items-center">
+                    <div class="col-lg-5 text-center text-lg-start">
+                        <img src="https://cdn-icons-png.flaticon.com/512/174/174855.png" class="social-logo" alt="Instagram">
+                        <h2>Instagram Feed</h2>
+                        <p class="lead text-white-50">Follow Avishkar Vishwasrao for studio BTS, lifestyle updates, and creative reels.</p>
+                        <div class="mt-4">
+                            <a href="https://www.instagram.com/avishkar_vishwasrao/" target="_blank" class="btn btn-warning fw-bold px-4 me-2">Follow Avishkar</a>
+                            <a href="https://www.instagram.com/bhaktistudioofficial/" target="_blank" class="btn btn-outline-light px-4">Studio Official</a>
+                        </div>
+                    </div>
+                    <div class="col-lg-7 mt-5 mt-lg-0">
+                        <div class="row g-2">
+                            <div class="col-4"><img src="{{ url_for('static', filename='images/avi1.jpeg') }}" class="img-fluid rounded border border-secondary" alt="Post"></div>
+                            <div class="col-4"><img src="{{ url_for('static', filename='images/avi5.jpeg') }}" class="img-fluid rounded border border-secondary" alt="Post"></div>
+                            <div class="col-4"><img src="{{ url_for('static', filename='images/avi2.jpeg') }}" class="img-fluid rounded border border-secondary" alt="Post"></div>
+                            
+                            <div class="col-4">
+                                <video class="img-fluid rounded border border-secondary shadow-sm" autoplay muted loop playsinline>
+                                    <source src="{{ url_for('static', filename='videos/v4.mp4') }}" type="video/mp4">
+                                </video>
+                            </div>
+                            <div class="col-4">
+                                <video class="img-fluid rounded border border-secondary shadow-sm" autoplay muted loop playsinline>
+                                    <source src="{{ url_for('static', filename='videos/v1.mp4') }}" type="video/mp4">
+                                </video>
+                            </div>
+                            
+                            <div class="col-4">
+                                <video class="img-fluid rounded border border-secondary shadow-sm" autoplay muted loop playsinline>
+                                    <source src="{{ url_for('static', filename='videos/v3.mp4') }}" type="video/mp4">
+                                </video>
+                            </div>
+                         
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact" class="parallax-section bg-studio-3">
+        <div class="container text-center">
+            <div class="glass-panel py-5" data-aos="zoom-in">
+                <h2 class="display-4 fw-bold mb-4">Let's Create a Masterpiece</h2>
+                <p class="lead mb-5 px-lg-5">Trusted by hundreds of political candidates and artists for premium audio identity and viral content.</p>
+                
+                <a href="https://wa.me/919146940518?text=Hello%20Avishkar%20Sir,%20I%20saw%20your%20Studio%20Website.%20I%20want%20to%20discuss%20my%20Campaign%20Project." 
+                   target="_blank" 
+                   class="wa-floating">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="bi bi-whatsapp" viewBox="0 0 16 16">
+                      <path d="M13.601 2.326A7.854 7.854 0 0 0 7.994 0C3.627 0 .068 3.558.064 7.926c0 1.399.366 2.76 1.057 3.965L0 16l4.204-1.102a7.933 7.933 0 0 0 3.79.965h.004c4.368 0 7.926-3.558 7.93-7.93A7.898 7.898 0 0 0 13.6 2.326zM7.994 14.521a6.573 6.573 0 0 1-3.356-.92l-.24-.144-2.494.654.666-2.433-.156-.251a6.56 6.56 0 0 1-1.007-3.505c0-3.626 2.957-6.584 6.591-6.584a6.56 6.56 0 0 1 4.66 1.931 6.557 6.557 0 0 1 1.928 4.66c-.004 3.639-2.961 6.592-6.592 6.592zm3.615-4.934c-.197-.099-1.17-.578-1.353-.646-.182-.065-.315-.099-.445.099-.133.197-.513.646-.627.775-.114.133-.232.148-.43.05-.197-.1-.836-.308-1.592-.985-.59-.525-.985-1.175-1.103-1.372-.114-.198-.011-.304.088-.403.087-.088.197-.232.296-.346.1-.114.133-.198.198-.33.065-.134.034-.248-.015-.347-.05-.099-.445-1.076-.612-1.47-.16-.389-.323-.335-.445-.34-.114-.007-.247-.007-.38-.007a.729.729 0 0 0-.529.247c-.182.198-.691.677-.691 1.654 0 .977.71 1.916.81 2.049.098.133 1.394 2.132 3.383 2.992.47.205.84.326 1.129.418.475.152.904.129 1.246.08.38-.058 1.171-.48 1.338-.943.164-.464.164-.86.114-.943-.049-.084-.182-.133-.38-.232z"/>
+                   </svg>
+                   WhatsApp Consultation
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        AOS.init({
+            duration: 1000,
+            once: true
+        });
+    </script>
+</body>
+</html>
