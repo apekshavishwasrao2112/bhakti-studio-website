@@ -14,8 +14,11 @@ def is_postgres_url(database_url: str) -> bool:
 def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
 
-    # PostgreSQL connection (Railway Production)
+    print("========== DATABASE DEBUG ==========")
+    print("DATABASE_URL exists:", bool(database_url))
+
     if database_url:
+        print("Using PostgreSQL database")
 
         if is_postgres_url(database_url):
 
@@ -27,12 +30,12 @@ def get_db_connection():
                     sslmode='require'
                 )
 
-                print("✅ Connected to PostgreSQL successfully")
+                print("✅ PostgreSQL connected successfully")
 
                 return conn
 
-            except ImportError:
-                print("❌ psycopg2 not installed. Install with: pip install psycopg2-binary")
+            except ImportError as err:
+                print(f"❌ psycopg2 import error: {err}")
                 return None
 
             except Exception as err:
@@ -40,15 +43,16 @@ def get_db_connection():
                 return None
 
         else:
-            print("❌ DATABASE_URL is set but is not a supported PostgreSQL URL.")
+            print("❌ DATABASE_URL format invalid")
             return None
 
-    # SQLite connection (Local Development)
+
     try:
+        print("Using SQLite database")
 
         conn = sqlite3.connect('bhakti_studio.db')
 
-        print("✅ Connected to SQLite successfully")
+        print("✅ SQLite connected successfully")
 
         return conn
 
