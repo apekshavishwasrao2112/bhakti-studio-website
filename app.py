@@ -12,8 +12,10 @@ from datetime import datetime
 load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.getenv('SECRET_KEY', 'fallback-secret-key-change-this')
-# csrf = CSRFProtect(app)  # Temporarily disabled for testing
+app.secret_key = os.environ["SECRET_KEY"]
+if not app.secret_key:
+    raise ValueError("SECRET_KEY environment variable is missing")
+csrf = CSRFProtect(app)  # Temporarily disabled for testing
 
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -29,7 +31,7 @@ login_attempts = {}
 class LoginForm(FlaskForm):
     username = StringField('Username', [validators.DataRequired(), validators.Length(min=3, max=50)])
     password = PasswordField('Password', [validators.DataRequired(), validators.Length(min=6)])
-    # csrf_token = HiddenField()  # Temporarily disabled
+    csrf_token = HiddenField()  # Temporarily disabled
 
 @app.route("/admin")
 def admin_redirect():
