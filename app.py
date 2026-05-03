@@ -1,7 +1,7 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, Response, session, jsonify, flash
 from flask_wtf import FlaskForm, CSRFProtect
-from wtforms import StringField, PasswordField, validators
+from wtforms import StringField, PasswordField, validators, HiddenField
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import *
 from dotenv import load_dotenv
@@ -15,7 +15,13 @@ app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
 if not app.secret_key:
     raise ValueError("SECRET_KEY environment variable is missing")
-csrf = CSRFProtect(app)  # Temporarily disabled for testing
+csrf = CSRFProtect(app) 
+# Initialize database on startup
+try:
+    init()
+    print("✅ Database initialized")
+except Exception as e:
+    print(f"❌ Init failed: {e}")
 
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -470,10 +476,4 @@ def chat():
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
-    try:
-        init()
-        print("Starting Bhakti Studio web application...")
-    except Exception as e:
-        print(f"Database initialization failed: {e}")
-    # Production: Remove debug=True
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=True)
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
