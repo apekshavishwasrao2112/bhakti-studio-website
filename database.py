@@ -11,19 +11,22 @@ def is_postgres_url(database_url: str) -> bool:
         return False
     return database_url.startswith(('postgresql://', 'postgres://'))
 
-
 def get_db_connection():
-    database_url = os.getenv("DATABASE_URL")
+    database_url = os.getenv('DATABASE_URL')
 
     # PostgreSQL connection (Production - Railway)
     if database_url:
+
         if is_postgres_url(database_url):
+
             try:
                 import psycopg2
 
-                print("✅ Connected to PostgreSQL")
+                conn = psycopg2.connect(database_url)
 
-                return psycopg2.connect(database_url)
+                print("✅ Connected to PostgreSQL successfully")
+
+                return conn
 
             except ImportError:
                 print("❌ psycopg2 not installed. Install with: pip install psycopg2-binary")
@@ -39,9 +42,12 @@ def get_db_connection():
 
     # SQLite connection (Local Development)
     try:
-        print("✅ Connected to SQLite")
 
-        return sqlite3.connect('bhakti_studio.db')
+        conn = sqlite3.connect('bhakti_studio.db')
+
+        print("✅ Connected to SQLite successfully")
+
+        return conn
 
     except Exception as err:
         print(f"❌ SQLite connection failed: {err}")
