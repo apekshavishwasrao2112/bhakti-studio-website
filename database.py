@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def is_postgres_url(database_url: str) -> bool:
     if not database_url:
         return False
@@ -14,25 +15,36 @@ def is_postgres_url(database_url: str) -> bool:
 def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
 
+    # PostgreSQL connection (Production - Railway)
     if database_url:
         if is_postgres_url(database_url):
             try:
                 import psycopg2
+
+                print("✅ Connected to PostgreSQL")
+
                 return psycopg2.connect(database_url)
+
             except ImportError:
-                print("psycopg2 not installed. Install with: pip install psycopg2-binary")
+                print("❌ psycopg2 not installed. Install with: pip install psycopg2-binary")
                 return None
+
             except Exception as err:
-                print(f"PostgreSQL connection failed: {err}")
+                print(f"❌ PostgreSQL connection failed: {err}")
                 return None
+
         else:
-            print("DATABASE_URL is set but is not a supported PostgreSQL URL.")
+            print("❌ DATABASE_URL is set but is not a supported PostgreSQL URL.")
             return None
 
+    # SQLite connection (Local Development)
     try:
+        print("✅ Connected to SQLite")
+
         return sqlite3.connect('bhakti_studio.db')
+
     except Exception as err:
-        print(f"SQLite connection failed: {err}")
+        print(f"❌ SQLite connection failed: {err}")
         return None
 
 
@@ -47,22 +59,25 @@ def get_param_style(conn):
 def init():
     try:
         conn = get_db_connection()
+
         if conn is None:
-            print("Database not available. Skipping initialization.")
+            print("❌ Database not available. Skipping initialization.")
             return
 
         cursor = conn.cursor()
 
-        # Check if using PostgreSQL or SQLite
-        is_postgres = hasattr(conn, 'closed') and 'psycopg2' in str(type(conn))
+        is_postgres = is_postgres_connection(conn)
 
+        # =========================
+        # PostgreSQL Tables
+        # =========================
         if is_postgres:
-            # PostgreSQL tables
+
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS chat_history (
-            id SERIAL PRIMARY KEY,
-            user_message TEXT,
-            bot_reply TEXT
+                id SERIAL PRIMARY KEY,
+                user_message TEXT,
+                bot_reply TEXT
             )
             """)
 
@@ -75,23 +90,28 @@ def init():
             """)
 
             cursor.execute("""
-            CREATE TABLE IF NOT EXISTS bookings(
+            CREATE TABLE IF NOT EXISTS bookings (
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(100),
                 phone VARCHAR(20),
                 service VARCHAR(50),
                 booking_date DATE,
-                status VARCHAR(20) DEFAULT 'Pending' CHECK (status IN ('Pending', 'Confirmed', 'Completed', 'Rejected')),
+                status VARCHAR(20) DEFAULT 'Pending'
+                    CHECK (status IN ('Pending', 'Confirmed', 'Completed', 'Rejected')),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
             """)
+
+        # =========================
+        # SQLite Tables
+        # =========================
         else:
-            # SQLite tables
+
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS chat_history (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_message TEXT,
-            bot_reply TEXT
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_message TEXT,
+                bot_reply TEXT
             )
             """)
 
@@ -104,7 +124,7 @@ def init():
             """)
 
             cursor.execute("""
-            CREATE TABLE IF NOT EXISTS bookings(
+            CREATE TABLE IF NOT EXISTS bookings (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 name TEXT,
                 phone TEXT,
@@ -115,28 +135,53 @@ def init():
             )
             """)
 
-        # Check if admin exists, if not create with hashed password
-        cursor.execute("SELECT COUNT(*) FROM admin")
+        # =========================
+        # Create Admin If Not Exists
+        # =========================
+
+        cursor.execute("SELECT COUNT(*) FROM admin;")
+
         result = cursor.fetchone()
+
         if result[0] == 0:
-           # 🔐 Read secure credentials from .env
+
             admin_username = os.getenv("ADMIN_USERNAME")
             admin_password = os.getenv("ADMIN_PASSWORD")
 
             if not admin_username or not admin_password:
-                raise Exception("❌ ADMIN_USERNAME or ADMIN_PASSWORD not set in .env")
+                raise Exception("❌ ADMIN_USERNAME or ADMIN_PASSWORD not set in environment variables")
 
             hashed_password = generate_password_hash(admin_password)
 
-            cursor.execute(
-                "INSERT INTO admin (username, password) VALUES (?, ?)" if not is_postgres else
-                "INSERT INTO admin (username, password) VALUES (%s, %s)",
-                (admin_username, hashed_password)
-            )
+            if is_postgres:
+
+                cursor.execute(
+                    """
+                    INSERT INTO admin (username, password)
+                    VALUES (%s, %s)
+                    """,
+                    (admin_username, hashed_password)
+                )
+
+            else:
+
+                cursor.execute(
+                    """
+                    INSERT INTO admin (username, password)
+                    VALUES (?, ?)
+                    """,
+                    (admin_username, hashed_password)
+                )
+
+            print("✅ Admin account created successfully")
+
         conn.commit()
+
         cursor.close()
         conn.close()
-        print("Database initialized successfully.")
+
+        print("✅ Database initialized successfully.")
+
     except Exception as err:
-        print(f"Database initialization failed: {err}")
-        print("Application will continue without database functionality.")
+        print(f"❌ Database initialization failed: {err}")
+        print("⚠️ Application will continue without database functionality.")
