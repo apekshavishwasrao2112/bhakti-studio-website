@@ -37,7 +37,7 @@ login_attempts = {}
 class LoginForm(FlaskForm):
     username = StringField('Username', [validators.DataRequired(), validators.Length(min=3, max=50)])
     password = PasswordField('Password', [validators.DataRequired(), validators.Length(min=6)])
-    csrf_token = HiddenField()  # Temporarily disabled
+    # csrf_token = HiddenField()  # Temporarily disabled
 
 @app.route("/admin")
 def admin_redirect():
