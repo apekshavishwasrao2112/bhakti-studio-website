@@ -13,7 +13,7 @@ def is_postgres_url(database_url: str) -> bool:
 
 
 def get_db_connection():
-    database_url = os.getenv('DATABASE_URL')
+    database_url = os.getenv("DATABASE_URL")
 
     # PostgreSQL connection (Production - Railway)
     if database_url:
