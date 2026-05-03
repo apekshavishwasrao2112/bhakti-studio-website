@@ -14,7 +14,7 @@ def is_postgres_url(database_url: str) -> bool:
 def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
 
-    # PostgreSQL connection (Production - Railway)
+    # PostgreSQL connection (Railway Production)
     if database_url:
 
         if is_postgres_url(database_url):
@@ -22,7 +22,10 @@ def get_db_connection():
             try:
                 import psycopg2
 
-                conn = psycopg2.connect(database_url)
+                conn = psycopg2.connect(
+                    database_url,
+                    sslmode='require'
+                )
 
                 print("✅ Connected to PostgreSQL successfully")
 
@@ -52,7 +55,7 @@ def get_db_connection():
     except Exception as err:
         print(f"❌ SQLite connection failed: {err}")
         return None
-
+    
 
 def is_postgres_connection(conn) -> bool:
     return conn is not None and hasattr(conn, 'closed') and 'psycopg2' in str(type(conn))
