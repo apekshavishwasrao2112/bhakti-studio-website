@@ -4,13 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Booking - Bhakti Studio</title>
-
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.ico.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
 </head>
-
 <body>
-
     <!-- Video Background -->
     <div class="video-background">
         <video autoplay muted loop class="bg-video">
@@ -18,7 +15,7 @@
         </video>
     </div>
 
-    <!-- ✅ Success Modal -->
+    <!-- Success Message Modal -->
     <div id="successModal" class="modal" style="display: none;">
         <div class="modal-content">
             <div class="success-icon">✅</div>
@@ -28,20 +25,18 @@
         </div>
     </div>
 
-    <!-- Booking Form -->
+    <!-- Booking Form Container -->
     <div class="booking-container">
         <div class="blur-form">
             <h2 id="title">🎵 Book Your Session</h2>
 
             <!-- Language Buttons -->
             <div class="lang-buttons">
-                <button type="button" class="lang-btn active" onclick="setLang(event, 'en')">English</button>
-                <button type="button" class="lang-btn" onclick="setLang(event, 'mr')">मराठी</button>
+                <button class="lang-btn active" onclick="setLang('en')">English</button>
+                <button class="lang-btn" onclick="setLang('mr')">मराठी</button>
             </div>
 
             <form id="bookingForm" method="POST" action="/booking">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
                 <div class="form-group">
                     <input type="text" name="name" id="name" placeholder="Your Name" required>
                 </div>
@@ -51,11 +46,11 @@
                 </div>
 
                 <div class="form-group">
-                    <select name="service" id="service" required style="color: black;">
-                        <option value="" style="color: black;">Select Service</option>
-                        <option value="song" style="color: black;">🎵 Song Recording</option>
-                        <option value="reel" style="color: black;">🎬 Video Reel</option>
-                        <option value="announcement" style="color: black;">📣 Announcement</option>
+                    <select name="service" id="service">
+                        <option class="op" value="">Select Service</option>
+                        <option class="op" value="song">🎵 Song Recording</option>
+                        <option class="op" value="reel">🎬 Video Reel</option>
+                        <option class="op" value="announcement">📣 Announcement</option>
                     </select>
                 </div>
 
@@ -64,25 +59,22 @@
                 </div>
 
                 <button type="submit" id="submitBtn" class="submit-btn">Book Now</button>
-
             </form>
         </div>
     </div>
 
     <script>
-
-        // ✅ FIXED: event parameter added
-        function setLang(event, lang) {
+        function setLang(lang) {
             const buttons = document.querySelectorAll('.lang-btn');
             buttons.forEach(btn => btn.classList.remove('active'));
 
-            event.target.classList.add('active');
-
             if (lang === "mr") {
+                event.target.classList.add('active');
                 document.getElementById("title").innerText = "🎵 तुमची सत्र बुक करा";
                 document.getElementById("name").placeholder = "तुमचे नाव";
                 document.getElementById("phone").placeholder = "मोबाईल नंबर";
             } else {
+                event.target.classList.add('active');
                 document.getElementById("title").innerText = "🎵 Book Your Session";
                 document.getElementById("name").placeholder = "Your Name";
                 document.getElementById("phone").placeholder = "Mobile Number";
@@ -90,11 +82,9 @@
         }
 
         function showSuccessModal() {
-            const modal = document.getElementById('successModal');
-            modal.style.display = 'flex';
-
+            document.getElementById('successModal').style.display = 'flex';
             setTimeout(() => {
-                modal.classList.add('show');
+                document.getElementById('successModal').classList.add('show');
             }, 100);
         }
 
@@ -102,27 +92,19 @@
             window.location.href = '/logo';
         }
 
-        // ✅ MAIN FIX: detect success in URL reliably
-        document.addEventListener("DOMContentLoaded", function () {
-            const urlParams = new URLSearchParams(window.location.search);
+        // Check for success parameter in URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === 'true') {
+            showSuccessModal();
+        }
 
-            if (urlParams.get('success') === 'true') {
-                showSuccessModal();
-
-                // ✅ Remove success param after showing modal (clean URL)
-                window.history.replaceState({}, document.title, window.location.pathname);
-            }
-        });
-
-        // ✅ Loading state on submit
+        // Form submission with loading state
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
             const submitBtn = document.getElementById('submitBtn');
-            setTimeout(() => {
-                submitBtn.innerHTML = '⏳ Booking...';
-                submitBtn.disabled = true;
-            }, 50);
+            submitBtn.innerHTML = '<span class="spinner"></span> Booking...';
+            submitBtn.disabled = true;
         });
-
+    
     </script>
 
 </body>
