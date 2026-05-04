@@ -1,173 +1,98 @@
 import os
-import sqlite3
+import psycopg2
 from werkzeug.security import generate_password_hash
 from dotenv import load_dotenv
 
 load_dotenv()
 
-
-def is_postgres_url(database_url: str) -> bool:
-    if not database_url:
-        return False
-    return database_url.startswith(('postgresql://', 'postgres://'))
-
 def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
 
+    if not database_url:
+        print("❌ DATABASE_URL is not set in environment variables.")
+        return None
+
+    # Railway's PostgreSQL URL might start with postgres://, which some libraries
+    # struggle with, though psycopg2 is usually fine. We replace it just in case.
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+
     print("========== DATABASE DEBUG ==========")
-    print("DATABASE_URL exists:", bool(database_url))
-
-    if database_url:
-        print("Using PostgreSQL database")
-
-        if is_postgres_url(database_url):
-
-            try:
-                import psycopg2
-
-                conn = psycopg2.connect(
-                    database_url,
-                    sslmode='require'
-                )
-
-                print("✅ PostgreSQL connected successfully")
-
-                return conn
-
-            except ImportError as err:
-                print(f"❌ psycopg2 import error: {err}")
-                return None
-
-            except Exception as err:
-                print(f"❌ PostgreSQL connection failed: {err}")
-                return None
-
-        else:
-            print("❌ DATABASE_URL format invalid")
-            return None
-
+    print("Connecting to PostgreSQL...")
 
     try:
-        print("Using SQLite database")
-
-        conn = sqlite3.connect('bhakti_studio.db')
-
-        print("✅ SQLite connected successfully")
-
+        conn = psycopg2.connect(
+            database_url,
+            sslmode='require'
+        )
+        print("✅ PostgreSQL connected successfully")
         return conn
 
     except Exception as err:
-        print(f"❌ SQLite connection failed: {err}")
+        print(f"❌ PostgreSQL connection failed: {err}")
         return None
-    
 
-def is_postgres_connection(conn) -> bool:
-    return conn is not None and hasattr(conn, 'closed') and 'psycopg2' in str(type(conn))
-
-
-def get_param_style(conn):
-    return '%s' if is_postgres_connection(conn) else '?'
-
+def get_param_style(conn=None):
+    # We are strictly using PostgreSQL now
+    return '%s'
 
 def init():
+    print("========== INIT DATABASE ==========")
+    conn = get_db_connection()
+
+    if conn is None:
+        print("❌ Database not available. Skipping initialization.")
+        return
+
     try:
-        conn = get_db_connection()
-
-        if conn is None:
-            print("❌ Database not available. Skipping initialization.")
-            return
-
         cursor = conn.cursor()
-
-        is_postgres = is_postgres_connection(conn)
 
         # =========================
         # PostgreSQL Tables
         # =========================
-        if is_postgres:
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS chat_history (
+            id SERIAL PRIMARY KEY,
+            user_message TEXT,
+            bot_reply TEXT
+        )
+        """)
 
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS chat_history (
-                id SERIAL PRIMARY KEY,
-                user_message TEXT,
-                bot_reply TEXT
-            )
-            """)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS admin (
+            id SERIAL PRIMARY KEY,
+            username VARCHAR(50) UNIQUE NOT NULL,
+            password VARCHAR(255) NOT NULL
+        )
+        """)
 
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS admin (
-                id SERIAL PRIMARY KEY,
-                username VARCHAR(50) UNIQUE NOT NULL,
-                password VARCHAR(255) NOT NULL
-            )
-            """)
-
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS bookings (
-                id SERIAL PRIMARY KEY,
-                name VARCHAR(100),
-                phone VARCHAR(20),
-                service VARCHAR(50),
-                booking_date DATE,
-                status VARCHAR(20) DEFAULT 'Pending'
-                    CHECK (status IN ('Pending', 'Confirmed', 'Completed', 'Rejected')),
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-            """)
-
-        # =========================
-        # SQLite Tables
-        # =========================
-        else:
-
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS chat_history (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_message TEXT,
-                bot_reply TEXT
-            )
-            """)
-
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS admin (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE NOT NULL,
-                password TEXT NOT NULL
-            )
-            """)
-
-            cursor.execute("""
-            CREATE TABLE IF NOT EXISTS bookings (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                name TEXT,
-                phone TEXT,
-                service TEXT,
-                booking_date TEXT,
-                status TEXT DEFAULT 'Pending',
-                created_at TEXT DEFAULT CURRENT_TIMESTAMP
-            )
-            """)
+        cursor.execute("""
+        CREATE TABLE IF NOT EXISTS bookings (
+            id SERIAL PRIMARY KEY,
+            name VARCHAR(100),
+            phone VARCHAR(20),
+            service VARCHAR(50),
+            booking_date DATE,
+            status VARCHAR(20) DEFAULT 'Pending'
+                CHECK (status IN ('Pending', 'Confirmed', 'Completed', 'Rejected')),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+        """)
 
         # =========================
         # Create Admin If Not Exists
         # =========================
-
         cursor.execute("SELECT COUNT(*) FROM admin;")
-
         result = cursor.fetchone()
 
         if result[0] == 0:
-
             admin_username = os.getenv("ADMIN_USERNAME")
             admin_password = os.getenv("ADMIN_PASSWORD")
 
             if not admin_username or not admin_password:
-                raise Exception("❌ ADMIN_USERNAME or ADMIN_PASSWORD not set in environment variables")
-
-            hashed_password = generate_password_hash(admin_password)
-
-            if is_postgres:
-
+                print("❌ ADMIN_USERNAME or ADMIN_PASSWORD not set in environment variables")
+            else:
+                hashed_password = generate_password_hash(admin_password)
                 cursor.execute(
                     """
                     INSERT INTO admin (username, password)
@@ -175,21 +100,9 @@ def init():
                     """,
                     (admin_username, hashed_password)
                 )
-
-            else:
-
-                cursor.execute(
-                    """
-                    INSERT INTO admin (username, password)
-                    VALUES (?, ?)
-                    """,
-                    (admin_username, hashed_password)
-                )
-
-            print("✅ Admin account created successfully")
+                print("✅ Admin account created successfully")
 
         conn.commit()
-
         cursor.close()
         conn.close()
 
@@ -197,4 +110,6 @@ def init():
 
     except Exception as err:
         print(f"❌ Database initialization failed: {err}")
-        print("⚠️ Application will continue without database functionality.")
+        if conn:
+            conn.rollback()
+            conn.close()

@@ -115,10 +115,12 @@
         };
 
         // ✅ Loading state on submit
-        document.getElementById('bookingForm').addEventListener('submit', function() {
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
             const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerHTML = '⏳ Booking...';
-            submitBtn.disabled = true;
+            setTimeout(() => {
+                submitBtn.innerHTML = '⏳ Booking...';
+                submitBtn.disabled = true;
+            }, 50);
         });
 
     </script>

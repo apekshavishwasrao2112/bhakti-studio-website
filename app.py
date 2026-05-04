@@ -16,12 +16,7 @@ app.secret_key = os.environ["SECRET_KEY"]
 if not app.secret_key:
     raise ValueError("SECRET_KEY environment variable is missing")
 csrf = CSRFProtect(app) 
-# Initialize database on startup
-try:
-    init()
-    print("✅ Database initialized")
-except Exception as e:
-    print(f"❌ Init failed: {e}")
+
 
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True
