@@ -37,6 +37,8 @@
             </div>
 
             <form id="bookingForm" method="POST" action="/booking">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                
                 <div class="form-group">
                     <input type="text" name="name" id="name" placeholder="Your Name" required>
                 </div>
