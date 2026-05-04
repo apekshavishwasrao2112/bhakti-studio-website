@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 import time
 import re
 from datetime import datetime
+from database import init
 
 load_dotenv()
 
@@ -15,6 +16,8 @@ app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
 if not app.secret_key:
     raise ValueError("SECRET_KEY environment variable is missing")
+
+init()  
 csrf = CSRFProtect(app) 
 
 
