@@ -9,7 +9,7 @@ def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
 
     if not database_url:
-        print("❌ DATABASE_URL is not set in environment variables.")
+        print("[ERROR] DATABASE_URL is not set in environment variables.")
         return None
 
     # Railway's PostgreSQL URL might start with postgres://, which some libraries
@@ -21,15 +21,16 @@ def get_db_connection():
     print("Connecting to PostgreSQL...")
 
     try:
+        # Use sslmode='prefer' which handles both internal (no SSL) and external (SSL) connections well
         conn = psycopg2.connect(
             database_url,
-            sslmode='require'
+            sslmode='prefer'
         )
-        print("✅ PostgreSQL connected successfully")
+        print("[SUCCESS] PostgreSQL connected successfully")
         return conn
 
     except Exception as err:
-        print(f"❌ PostgreSQL connection failed: {err}")
+        print(f"[ERROR] PostgreSQL connection failed: {err}")
         return None
 
 def get_param_style(conn=None):
@@ -41,7 +42,7 @@ def init():
     conn = get_db_connection()
 
     if conn is None:
-        print("❌ Database not available. Skipping initialization.")
+        print("[ERROR] Database not available. Skipping initialization.")
         return
 
     try:
@@ -90,7 +91,7 @@ def init():
             admin_password = os.getenv("ADMIN_PASSWORD")
 
             if not admin_username or not admin_password:
-                print("❌ ADMIN_USERNAME or ADMIN_PASSWORD not set in environment variables")
+                print("[ERROR] ADMIN_USERNAME or ADMIN_PASSWORD not set in environment variables")
             else:
                 hashed_password = generate_password_hash(admin_password)
                 cursor.execute(
@@ -100,16 +101,16 @@ def init():
                     """,
                     (admin_username, hashed_password)
                 )
-                print("✅ Admin account created successfully")
+                print("[SUCCESS] Admin account created successfully")
 
         conn.commit()
         cursor.close()
         conn.close()
 
-        print("✅ Database initialized successfully.")
+        print("[SUCCESS] Database initialized successfully.")
 
     except Exception as err:
-        print(f"❌ Database initialization failed: {err}")
+        print(f"[ERROR] Database initialization failed: {err}")
         if conn:
             conn.rollback()
             conn.close()

@@ -51,11 +51,11 @@
                 </div>
 
                 <div class="form-group">
-                    <select  name="service" id="service" required>
-                        <option value="" >Select Service</option>
-                        <option value="song">🎵 Song Recording</option>
-                        <option value="reel">🎬 Video Reel</option>
-                        <option value="announcement">📣 Announcement</option>
+                    <select name="service" id="service" required style="color: black;">
+                        <option value="" style="color: black;">Select Service</option>
+                        <option value="song" style="color: black;">🎵 Song Recording</option>
+                        <option value="reel" style="color: black;">🎬 Video Reel</option>
+                        <option value="announcement" style="color: black;">📣 Announcement</option>
                     </select>
                 </div>
 
@@ -102,17 +102,17 @@
             window.location.href = '/logo';
         }
 
-        // ✅ MAIN FIX: detect success in URL
-        window.onload = function () {
+        // ✅ MAIN FIX: detect success in URL reliably
+        document.addEventListener("DOMContentLoaded", function () {
             const urlParams = new URLSearchParams(window.location.search);
 
             if (urlParams.get('success') === 'true') {
                 showSuccessModal();
 
                 // ✅ Remove success param after showing modal (clean URL)
-                window.history.replaceState({}, document.title, "/booking");
+                window.history.replaceState({}, document.title, window.location.pathname);
             }
-        };
+        });
 
         // ✅ Loading state on submit
         document.getElementById('bookingForm').addEventListener('submit', function(e) {
