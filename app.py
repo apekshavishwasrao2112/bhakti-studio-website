@@ -458,18 +458,21 @@ def chat():
     # SAVE CHAT
     try:
         conn = get_db_connection()
-        cursor = conn.cursor()
-        placeholder = get_param_style(conn)
+        if conn is None:
+            print("[ERROR] Database not available to save chat history")
+        else:
+            cursor = conn.cursor()
+            placeholder = get_param_style(conn)
 
-        cursor.execute(
-            f"INSERT INTO chat_history (user_message, bot_reply) VALUES ({placeholder}, {placeholder})",
-            (user_message, reply)
-        )
+            cursor.execute(
+                f"INSERT INTO chat_history (user_message, bot_reply) VALUES ({placeholder}, {placeholder})",
+                (user_message, reply)
+            )
 
-        conn.commit()
-        conn.close()
+            conn.commit()
+            conn.close()
     except Exception as e:
-        print(f"Database error: {e}")
+        print(f"[ERROR] Database error in chat saving: {e}")
 
     return jsonify({"reply": reply})
 

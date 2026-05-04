@@ -1,38 +1,52 @@
 import os
+import sqlite3
 import psycopg2
+from psycopg2 import OperationalError
 from werkzeug.security import generate_password_hash
 from dotenv import load_dotenv
 
 load_dotenv()
 
+def is_postgres():
+    return bool(os.getenv('DATABASE_URL'))
+
 def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
 
-    if not database_url:
-        print("[ERROR] DATABASE_URL is not set")
-        return None
-
-    if database_url.startswith("postgres://"):
-        database_url = database_url.replace("postgres://", "postgresql://", 1)
-
-    print("========== DATABASE DEBUG ==========")
-
-    try:
-        conn = psycopg2.connect(
-            database_url,
-            sslmode='require',   # ✅ IMPORTANT CHANGE
-            connect_timeout=10
-        )
-        print("[SUCCESS] PostgreSQL connected successfully")
-        return conn
-
-    except Exception as err:
-        print(f"[ERROR] PostgreSQL connection failed: {err}")
-        return None
+    if database_url:
+        # Use PostgreSQL for Production
+        if database_url.startswith("postgres://"):
+            database_url = database_url.replace("postgres://", "postgresql://", 1)
+        
+        try:
+            conn = psycopg2.connect(
+                database_url,
+                sslmode='require',
+                connect_timeout=10
+            )
+            print("[SUCCESS] Connected to PostgreSQL")
+            return conn
+        except OperationalError as err:
+            print(f"[ERROR] PostgreSQL connection failed: {err}")
+            return None
+        except Exception as err:
+            print(f"[ERROR] Database error: {err}")
+            return None
+    else:
+        # Use SQLite for Local Development
+        try:
+            conn = sqlite3.connect('local.db', check_same_thread=False)
+            print("[SUCCESS] Connected to SQLite")
+            return conn
+        except Exception as err:
+            print(f"[ERROR] SQLite connection failed: {err}")
+            return None
 
 def get_param_style(conn=None):
-    # We are strictly using PostgreSQL now
-    return '%s'
+    # Returns the correct parameter placeholder based on the active DB
+    if is_postgres():
+        return '%s'
+    return '?'
 
 def init():
     print("========== INIT DATABASE ==========")
@@ -45,28 +59,34 @@ def init():
     try:
         cursor = conn.cursor()
 
+        # Dynamic Primary Key Syntax
+        if is_postgres():
+            id_column = "id SERIAL PRIMARY KEY"
+        else:
+            id_column = "id INTEGER PRIMARY KEY AUTOINCREMENT"
+
         # =========================
-        # PostgreSQL Tables
+        # Table Creation
         # =========================
-        cursor.execute("""
+        cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS chat_history (
-            id SERIAL PRIMARY KEY,
+            {id_column},
             user_message TEXT,
             bot_reply TEXT
         )
         """)
 
-        cursor.execute("""
+        cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS admin (
-            id SERIAL PRIMARY KEY,
+            {id_column},
             username VARCHAR(50) UNIQUE NOT NULL,
             password VARCHAR(255) NOT NULL
         )
         """)
 
-        cursor.execute("""
+        cursor.execute(f"""
         CREATE TABLE IF NOT EXISTS bookings (
-            id SERIAL PRIMARY KEY,
+            {id_column},
             name VARCHAR(100),
             phone VARCHAR(20),
             service VARCHAR(50),
@@ -91,10 +111,11 @@ def init():
                 print("[ERROR] ADMIN_USERNAME or ADMIN_PASSWORD not set in environment variables")
             else:
                 hashed_password = generate_password_hash(admin_password)
+                placeholder = get_param_style(conn)
                 cursor.execute(
-                    """
+                    f"""
                     INSERT INTO admin (username, password)
-                    VALUES (%s, %s)
+                    VALUES ({placeholder}, {placeholder})
                     """,
                     (admin_username, hashed_password)
                 )
