@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 def is_postgres():
-    return bool(os.getenv('DATABASE_URL'))
+    url = os.getenv('DATABASE_URL')
+    return url and 'postgres' in url
 
 def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
@@ -42,9 +43,8 @@ def get_db_connection():
             print(f"[ERROR] SQLite connection failed: {err}")
             return None
 
-def get_param_style(conn=None):
-    # Returns the correct parameter placeholder based on the active DB
-    if is_postgres():
+def get_param_style(conn):
+    if conn.__class__.__module__.startswith('psycopg2'):
         return '%s'
     return '?'
 
