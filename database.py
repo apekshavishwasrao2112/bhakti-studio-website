@@ -13,20 +13,27 @@ def is_postgres():
 
 def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
-    
 
     if database_url:
-        
-        if database_url.startswith("postgres://"):
-            database_url = database_url.replace("postgres://", "postgresql://", 1)
-
         try:
-            conn = psycopg2.connect(database_url, sslmode='require')  
+            # Fix Railway postgres URL
+            if database_url.startswith("postgres://"):
+                database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+            conn = psycopg2.connect(
+                database_url,
+                sslmode='require'   # ✅ CRITICAL FIX
+            )
+
             print("[SUCCESS] Connected to PostgreSQL")
             return conn
+
         except Exception as err:
             print(f"[ERROR] PostgreSQL connection failed: {err}")
             return None
+    else:
+        print("[ERROR] DATABASE_URL is missing")
+        return None
         
     else:
         # Use SQLite for Local Development

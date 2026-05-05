@@ -41,6 +41,13 @@ class LoginForm(FlaskForm):
 def admin_redirect():
     return redirect("/bhakti-secure-admin-portal-84729/login")
 
+@app.route("/force-init")
+def force_init():
+    from database import init
+    init()
+    return "DB INITIALIZED"
+
+
 @app.route("/bhakti-secure-admin-portal-84729/login", methods=["GET","POST"])
 def admin_login():
     if request.method == "POST":
