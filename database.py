@@ -13,6 +13,7 @@ def is_postgres():
 
 def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
+    print("DATABASE_URL:", database_url)
 
     if database_url:
         # Use PostgreSQL for Production
@@ -20,11 +21,7 @@ def get_db_connection():
             database_url = database_url.replace("postgres://", "postgresql://", 1)
         
         try:
-            conn = psycopg2.connect(
-                database_url,
-                sslmode='require',
-                connect_timeout=10
-            )
+            conn = psycopg2.connect(database_url)
             print("[SUCCESS] Connected to PostgreSQL")
             return conn
         except OperationalError as err:

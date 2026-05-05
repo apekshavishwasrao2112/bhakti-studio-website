@@ -272,6 +272,8 @@ def booking():
         # Date validation
         try:
             booking_date_obj = datetime.strptime(booking_date, '%Y-%m-%d')
+            booking_date = booking_date_obj.date()
+            
             if booking_date_obj.date() < datetime.now().date():
                 flash("Booking date cannot be in the past.", "error")
                 return redirect(url_for('booking'))
