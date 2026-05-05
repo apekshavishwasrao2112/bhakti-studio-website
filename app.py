@@ -19,7 +19,6 @@ app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 csrf = CSRFProtect(app)
 
-init()
 
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -486,4 +485,5 @@ def chat():
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
+    init()
     app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=False)
