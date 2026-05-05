@@ -19,7 +19,6 @@ app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 csrf = CSRFProtect(app)
 
-
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 if os.getenv('FLASK_ENV') == 'production':
