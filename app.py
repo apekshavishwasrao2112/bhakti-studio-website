@@ -14,12 +14,12 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ["SECRET_KEY"]
-if not app.secret_key:
-    raise ValueError("SECRET_KEY environment variable is missing")
 
-init()  
-csrf = CSRFProtect(app) 
+app.config['PREFERRED_URL_SCHEME'] = 'https'
 
+csrf = CSRFProtect(app)
+
+init()
 
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True

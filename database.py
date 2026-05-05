@@ -13,23 +13,21 @@ def is_postgres():
 
 def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
-    print("DATABASE_URL:", database_url)
+    
 
     if database_url:
-        # Use PostgreSQL for Production
+        
         if database_url.startswith("postgres://"):
             database_url = database_url.replace("postgres://", "postgresql://", 1)
-        
+
         try:
-            conn = psycopg2.connect(database_url)
+            conn = psycopg2.connect(database_url, sslmode='require')  
             print("[SUCCESS] Connected to PostgreSQL")
             return conn
-        except OperationalError as err:
+        except Exception as err:
             print(f"[ERROR] PostgreSQL connection failed: {err}")
             return None
-        except Exception as err:
-            print(f"[ERROR] Database error: {err}")
-            return None
+        
     else:
         # Use SQLite for Local Development
         try:
