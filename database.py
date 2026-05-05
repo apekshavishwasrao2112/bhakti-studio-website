@@ -14,15 +14,16 @@ def is_postgres():
 def get_db_connection():
     database_url = os.getenv('DATABASE_URL')
 
+    # ✅ If DATABASE_URL exists → use PostgreSQL
     if database_url:
+        
         try:
-            # Fix Railway postgres URL
             if database_url.startswith("postgres://"):
                 database_url = database_url.replace("postgres://", "postgresql://", 1)
 
             conn = psycopg2.connect(
                 database_url,
-                sslmode='require'   # ✅ CRITICAL FIX
+                sslmode='require'
             )
 
             print("[SUCCESS] Connected to PostgreSQL")
@@ -31,20 +32,17 @@ def get_db_connection():
         except Exception as err:
             print(f"[ERROR] PostgreSQL connection failed: {err}")
             return None
+
     else:
-        print("[ERROR] DATABASE_URL is missing")
-        return None
-        
-    else:
-        # Use SQLite for Local Development
         try:
             conn = sqlite3.connect('local.db', check_same_thread=False)
             print("[SUCCESS] Connected to SQLite")
             return conn
+
         except Exception as err:
             print(f"[ERROR] SQLite connection failed: {err}")
             return None
-
+        
 def get_param_style(conn):
     if conn.__class__.__module__.startswith('psycopg2'):
         return '%s'
