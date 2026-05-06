@@ -1,52 +1,29 @@
 import os
-import sqlite3
-import psycopg2
-from psycopg2 import OperationalError
+import mysql.connector
+from mysql.connector import Error
 from werkzeug.security import generate_password_hash
 from dotenv import load_dotenv
 
 load_dotenv()
 
-def is_postgres():
-    url = os.getenv('DATABASE_URL')
-    return url and 'postgres' in url
-
 def get_db_connection():
-    database_url = os.getenv('DATABASE_URL')
-
-    # ✅ If DATABASE_URL exists → use PostgreSQL
-    if database_url:
-        
-        try:
-            if database_url.startswith("postgres://"):
-                database_url = database_url.replace("postgres://", "postgresql://", 1)
-
-            conn = psycopg2.connect(
-                database_url,
-                sslmode=os.getenv("DB_SSLMODE", "require")
-            )
-
-            print("[SUCCESS] Connected to PostgreSQL")
+    try:
+        conn = mysql.connector.connect(
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME"),
+            port=int(os.getenv("DB_PORT", 3306)),
+            connection_timeout=10
+        )
+        if conn.is_connected():
             return conn
+    except Error as e:
+        print(f"[ERROR] MySQL connection failed: {e}")
+        return None
 
-        except Exception as err:
-            print(f"[ERROR] PostgreSQL connection failed: {err}")
-            return None
-
-    else:
-        try:
-            conn = sqlite3.connect('local.db', check_same_thread=False)
-            print("[SUCCESS] Connected to SQLite")
-            return conn
-
-        except Exception as err:
-            print(f"[ERROR] SQLite connection failed: {err}")
-            return None
-        
 def get_param_style(conn):
-    if conn.__class__.__module__.startswith('psycopg2'):
-        return '%s'
-    return '?'
+    return '%s'
 
 def init():
     print("========== INIT DATABASE ==========")
@@ -57,13 +34,10 @@ def init():
         return
 
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(buffered=True)
 
-        # Dynamic Primary Key Syntax
-        if is_postgres():
-            id_column = "id SERIAL PRIMARY KEY"
-        else:
-            id_column = "id INTEGER PRIMARY KEY AUTOINCREMENT"
+        # MySQL Primary Key Syntax
+        id_column = "id INT AUTO_INCREMENT PRIMARY KEY"
 
         # =========================
         # Table Creation
@@ -127,8 +101,8 @@ def init():
 
         print("[SUCCESS] Database initialized successfully.")
 
-    except Exception as err:
+    except Error as err:
         print(f"[ERROR] Database initialization failed: {err}")
-        if conn:
+        if conn and conn.is_connected():
             conn.rollback()
             conn.close()

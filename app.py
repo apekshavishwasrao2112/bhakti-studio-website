@@ -19,8 +19,6 @@ app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 csrf = CSRFProtect(app)
 
-init() 
-
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 if os.getenv('FLASK_ENV') == 'production':
@@ -41,9 +39,16 @@ class LoginForm(FlaskForm):
 def admin_redirect():
     return redirect("/bhakti-secure-admin-portal-84729/login")
 
-@app.route("/test")
-def test():
-    return "APP WORKING"
+@app.before_request
+def initialize_database():
+    if not hasattr(app, 'db_initialized'):
+        init()
+        app.db_initialized = True
+
+@app.route("/db-test")
+def db_test():
+    conn = get_db_connection()
+    return "DB CONNECTED" if conn else "DB FAILED"
 
 @app.route("/bhakti-secure-admin-portal-84729/login", methods=["GET","POST"])
 def admin_login():
@@ -72,7 +77,7 @@ def admin_login():
             return render_template("admin_login.html")
 
         try:
-            cursor = conn.cursor()
+            cursor = conn.cursor(buffered=True)
             placeholder = get_param_style(conn)
 
             cursor.execute(
@@ -121,7 +126,7 @@ def admin_dashboard():
                              db_status="Database not connected")
 
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(buffered=True)
 
      
         cursor.execute("SELECT COUNT(*) FROM bookings")
@@ -192,7 +197,7 @@ def update_status(booking_id, status):
         return jsonify({"success": False, "message": "Database not available"}), 500
 
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(buffered=True)
         placeholder = get_param_style(conn)
 
         cursor.execute(
@@ -288,7 +293,7 @@ def booking():
         conn = get_db_connection()
         if conn is not None:
             try:
-                cursor = conn.cursor()
+                cursor = conn.cursor(buffered=True)
                 placeholder = get_param_style(conn)
                 query = f"INSERT INTO bookings (name, phone, service, booking_date) VALUES ({', '.join([placeholder] * 4)})"
 
@@ -326,7 +331,7 @@ def delete_booking(id):
         return jsonify({"success": False, "message": "Database not available"}), 500
 
     try:
-        cursor = conn.cursor()
+        cursor = conn.cursor(buffered=True)
         placeholder = get_param_style(conn)
 
         cursor.execute(f"DELETE FROM bookings WHERE id = {placeholder}", (id,))
@@ -467,7 +472,7 @@ def chat():
         if conn is None:
             print("[ERROR] Database not available to save chat history")
         else:
-            cursor = conn.cursor()
+            cursor = conn.cursor(buffered=True)
             placeholder = get_param_style(conn)
 
             cursor.execute(
