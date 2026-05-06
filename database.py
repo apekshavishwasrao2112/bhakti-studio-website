@@ -23,7 +23,7 @@ def get_db_connection():
 
             conn = psycopg2.connect(
                 database_url,
-                sslmode='require'
+                sslmode=os.getenv("DB_SSLMODE", "require")
             )
 
             print("[SUCCESS] Connected to PostgreSQL")

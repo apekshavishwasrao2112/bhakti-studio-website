@@ -19,6 +19,8 @@ app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 csrf = CSRFProtect(app)
 
+init() 
+
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True
 if os.getenv('FLASK_ENV') == 'production':
@@ -55,7 +57,7 @@ def admin_login():
             return render_template("admin_login.html")
 
         # Brute force protection
-        client_ip = request.remote_addr
+        client_ip = request.headers.get('X-Forwarded-For', request.remote_addr)
         current_time = time.time()
 
         if client_ip in login_attempts:
@@ -481,5 +483,4 @@ def chat():
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
-    init()
-    app.run(host='0.0.0.0', port=int(os.getenv('PORT', 5000)), debug=False)
+    app.run(host='0.0.0.0', port=5000)
