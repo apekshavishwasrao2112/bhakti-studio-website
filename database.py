@@ -65,8 +65,7 @@ def init():
             phone VARCHAR(20),
             service VARCHAR(50),
             booking_date DATE,
-            status VARCHAR(20) DEFAULT 'Pending'
-                CHECK (status IN ('Pending', 'Confirmed', 'Completed', 'Rejected')),
+            status VARCHAR(20) DEFAULT 'Pending',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """)

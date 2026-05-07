@@ -1,6 +1,6 @@
-Flask==2.3.3
-python-dotenv==1.0.0
-Flask-WTF==1.1.1
-Werkzeug==2.3.7
-gunicorn==21.2.0
-mysql-connector-python
+Flask==3.0.3
+python-dotenv==1.0.1
+Flask-WTF==1.2.1
+Werkzeug==3.0.3
+gunicorn==22.0.0
+mysql-connector-python==9.0.0

@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import time
 import re
 from datetime import datetime
-from database import init
+
 
 load_dotenv()
 
@@ -48,7 +48,12 @@ def initialize_database():
 @app.route("/db-test")
 def db_test():
     conn = get_db_connection()
-    return "DB CONNECTED" if conn else "DB FAILED"
+
+    if conn:
+        conn.close()
+        return "DB CONNECTED"
+
+    return "DB FAILED"
 
 @app.route("/bhakti-secure-admin-portal-84729/login", methods=["GET","POST"])
 def admin_login():
@@ -488,4 +493,7 @@ def chat():
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5000)
+   app.run(
+    host='0.0.0.0',
+    port=int(os.getenv("PORT", 5000))
+)
