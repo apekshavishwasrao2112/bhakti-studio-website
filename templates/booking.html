@@ -35,7 +35,12 @@
                 <button class="lang-btn active" onclick="setLang('en')">English</button>
                 <button class="lang-btn" onclick="setLang('mr')">मराठी</button>
             </div>
-
+                
+            {% if request.args.get('success') == 'true' %}
+            <div style="background:green;color:white;padding:12px;border-radius:8px;margin-bottom:15px;">
+                Booking Submitted Successfully!
+            </div>
+            {% endif %}
             <form id="bookingForm" method="POST" action="/booking">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 

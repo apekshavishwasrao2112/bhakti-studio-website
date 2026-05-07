@@ -177,8 +177,9 @@ select {
     color: black;
 }
 
-select option {
-    color: black;
+select,
+option {
+    color: black !important;
 }
 
 .op{

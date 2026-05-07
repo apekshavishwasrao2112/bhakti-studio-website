@@ -18,6 +18,8 @@ app.secret_key = os.environ["SECRET_KEY"]
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 csrf = CSRFProtect(app)
+with app.app_context():
+    init()
 
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -39,11 +41,6 @@ class LoginForm(FlaskForm):
 def admin_redirect():
     return redirect("/bhakti-secure-admin-portal-84729/login")
 
-@app.before_request
-def initialize_database():
-    if not hasattr(app, 'db_initialized'):
-        init()
-        app.db_initialized = True
 
 @app.route("/db-test")
 def db_test():
