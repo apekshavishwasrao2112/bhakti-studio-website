@@ -6,6 +6,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def get_param_style(conn):
+    return "%s"
+
 def get_db_connection():
     try:
         conn = mysql.connector.connect(
