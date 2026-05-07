@@ -36,9 +36,6 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', [validators.DataRequired(), validators.Length(min=6)])
     # csrf_token = HiddenField()  # Temporarily disabled
 
-@app.route("and that color changes, but my confirmation page is not showing. Please set it correctly. ")
-def admin_redirect():
-    return redirect("/bhakti-secure-admin-portal-84729/login")
 
 
 @app.route("/db-test")
