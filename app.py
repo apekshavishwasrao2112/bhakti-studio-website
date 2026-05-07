@@ -36,7 +36,7 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', [validators.DataRequired(), validators.Length(min=6)])
     # csrf_token = HiddenField()  # Temporarily disabled
 
-@app.route("/admin")
+@app.route("and that color changes, but my confirmation page is not showing. Please set it correctly. ")
 def admin_redirect():
     return redirect("/bhakti-secure-admin-portal-84729/login")
 
@@ -259,7 +259,6 @@ def admin_social():
         return redirect("/bhakti-secure-admin-portal-84729/login")
     return render_template("socialMedia.html")
 
-
 @app.route("/booking", methods=["GET", "POST"])
 def booking():
 
@@ -283,30 +282,35 @@ def booking():
         try:
             booking_date_obj = datetime.strptime(booking_date, '%Y-%m-%d')
             booking_date = booking_date_obj.date()
-            
+
             if booking_date_obj.date() < datetime.now().date():
                 flash("Booking date cannot be in the past.", "error")
                 return redirect(url_for('booking'))
+
         except ValueError:
             flash("Invalid date format.", "error")
             return redirect(url_for('booking'))
 
         conn = get_db_connection()
+
         if conn is not None:
+            
             try:
                 cursor = conn.cursor(buffered=True)
-                placeholder = get_param_style(conn)
-                query = f"INSERT INTO bookings (name, phone, service, booking_date) VALUES ({', '.join([placeholder] * 4)})"
 
                 cursor.execute(
-                    query,
+                    """
+                    INSERT INTO bookings
+                    (name, phone, service, booking_date)
+                    VALUES (%s, %s, %s, %s)
+                    """,
                     (name, phone, service, booking_date)
                 )
 
                 conn.commit()
                 conn.close()
 
-                # ✅ SUCCESS REDIRECT
+                # SUCCESS PAGE
                 return redirect(url_for('booking', success='true'))
 
             except Exception as e:
@@ -318,7 +322,10 @@ def booking():
             flash("Database not available", "error")
             return redirect(url_for('booking'))
 
-    return render_template("booking.html")
+    return render_template(
+        "booking.html",
+        success=request.args.get('success')
+    )
 
 
 @app.route("/delete-booking/<int:id>", methods=["POST"])

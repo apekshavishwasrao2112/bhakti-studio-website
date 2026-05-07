@@ -177,9 +177,13 @@ select {
     color: black;
 }
 
-select,
-option {
-    color: black !important;
+select {
+    color: black;
+}
+
+select option {
+    color: black;
+    background: white;
 }
 
 .op{

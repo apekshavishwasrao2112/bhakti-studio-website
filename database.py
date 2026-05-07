@@ -1,43 +1,61 @@
 import os
 import mysql.connector
+from mysql.connector import Error
 from werkzeug.security import generate_password_hash
 from dotenv import load_dotenv
 
 load_dotenv()
 
 def get_db_connection():
-    return mysql.connector.connect(
-        host=os.getenv("DB_HOST"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD"),
-        database=os.getenv("DB_NAME"),
-        port=int(os.getenv("DB_PORT"))
-    )
+    try:
+        conn = mysql.connector.connect(
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            database=os.getenv("DB_NAME"),
+            port=int(os.getenv("DB_PORT"))
+        )
+
+        return conn
+
+    except Error as e:
+        print(f"[ERROR] MySQL connection failed: {e}")
+        return None
+
 
 def init():
+
     conn = get_db_connection()
+
+    if conn is None:
+        print("[ERROR] Database connection failed")
+        return
+
     cursor = conn.cursor()
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS admin (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        username VARCHAR(50),
-        password VARCHAR(255)
-    )
-    """)
-
+    # BOOKINGS TABLE
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS bookings (
         id INT AUTO_INCREMENT PRIMARY KEY,
-        name VARCHAR(100),
+        name VARCHAR(255),
         phone VARCHAR(20),
-        service VARCHAR(100),
+        service VARCHAR(255),
         booking_date DATE,
-        status VARCHAR(20) DEFAULT 'Pending',
+        status VARCHAR(50) DEFAULT 'Pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
     """)
 
+    # ADMIN TABLE
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS admin (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(255),
+        password VARCHAR(255)
+    )
+    """)
+
+    # CHAT TABLE
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS chat_history (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -46,16 +64,31 @@ def init():
     )
     """)
 
-    cursor.execute("SELECT * FROM admin WHERE username=%s", ("admin",))
-    admin = cursor.fetchone()
+    # CREATE ADMIN USER
+    admin_username = os.getenv("ADMIN_USERNAME")
+    admin_password = os.getenv("ADMIN_PASSWORD")
 
-    if not admin:
-        hashed = generate_password_hash(os.getenv("ADMIN_PASSWORD"))
+    cursor.execute(
+        "SELECT * FROM admin WHERE username=%s",
+        (admin_username,)
+    )
+
+    existing_admin = cursor.fetchone()
+
+    if not existing_admin:
+
+        hashed_password = generate_password_hash(admin_password)
+
         cursor.execute(
-            "INSERT INTO admin (username,password) VALUES (%s,%s)",
-            ("admin", hashed)
+            """
+            INSERT INTO admin (username, password)
+            VALUES (%s, %s)
+            """,
+            (admin_username, hashed_password)
         )
 
     conn.commit()
     cursor.close()
     conn.close()
+
+    print("[SUCCESS] MySQL Database Initialized")
