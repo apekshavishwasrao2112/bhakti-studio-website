@@ -18,8 +18,7 @@ app.secret_key = os.environ["SECRET_KEY"]
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 csrf = CSRFProtect(app)
-with app.app_context():
-    init()
+init()
 
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True
