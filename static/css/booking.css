@@ -173,6 +173,14 @@ select {
     padding-right: 45px;
     
 }
+select {
+    color: black;
+}
+
+select option {
+    color: black;
+}
+
 .op{
     color: black;
 }
