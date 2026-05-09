@@ -215,8 +215,6 @@ document.getElementById("userInput").value = text;
 sendMessage();
 }
 
-
-/* SEND MESSAGE FUNCTION */
 function sendMessage(){
 
 let input = document.getElementById("userInput");
@@ -227,37 +225,72 @@ if(message.trim()==="") return;
 let chat = document.getElementById("chatMessages");
 
 /* USER MESSAGE */
-chat.innerHTML += `<div class="userMsg"><span>${message}</span></div>`;
+chat.innerHTML += `
+<div class="userMsg">
+<span>${message}</span>
+</div>
+`;
 
-/* TYPING EFFECT */
+/* TYPING */
 let typing = document.createElement("div");
+
 typing.className = "typing";
+
 typing.innerText = "Typing...";
+
 chat.appendChild(typing);
 
 chat.scrollTop = chat.scrollHeight;
 
-/* FETCH API */
+/* FETCH */
 fetch("/chat",{
 method:"POST",
 headers:{
 "Content-Type":"application/json"
 },
-body:JSON.stringify({message:message})
+body:JSON.stringify({
+message:message
 })
-.then(response=>response.json())
-.then(data=>{
+})
+
+.then(async response => {
+
+if(!response.ok){
+throw new Error("Server Error");
+}
+
+return response.json();
+
+})
+
+.then(data => {
 
 typing.remove();
 
-/* BOT MESSAGE */
-chat.innerHTML += `<div class="botMsg"><span>${data.reply}</span></div>`;
+chat.innerHTML += `
+<div class="botMsg">
+<span>${data.reply}</span>
+</div>
+`;
 
 chat.scrollTop = chat.scrollHeight;
+
+})
+
+.catch(error => {
+
+typing.remove();
+
+chat.innerHTML += `
+<div class="botMsg">
+<span>⚠ Server error. Please try again.</span>
+</div>
+`;
+
+console.log(error);
 
 });
 
 input.value="";
 }
-
 </script>

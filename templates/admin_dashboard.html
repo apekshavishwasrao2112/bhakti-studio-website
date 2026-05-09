@@ -192,7 +192,7 @@
                 Confirm
             </button>
 
-            <button onclick="updateStatus({{ booking[0] }}, 'Rejected')" class="action-btn reject">
+           <button onclick="updateStatus({{ booking[0] }}, 'Rejected', '', '')" class="action-btn reject">
                 Reject
             </button>
 
@@ -254,15 +254,15 @@
             });
         });
 
-        // Update booking status
-    async function updateStatus(id, status, phone, name){
-
-    // OPEN WHATSAPP FIRST
-    if(status === "Confirmed"){
-        openWhatsApp(phone, name);
-    }
+ async function updateStatus(id, status, phone = "", name = ""){
 
     try{
+
+        // ONLY OPEN WHATSAPP FOR CONFIRM
+        if(status === "Confirmed" && phone){
+
+            openWhatsApp(phone, name);
+        }
 
         const res = await fetch(`/update-status/${id}/${status}`, {
             method: "POST"
