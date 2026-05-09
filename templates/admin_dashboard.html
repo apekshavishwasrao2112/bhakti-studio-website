@@ -255,23 +255,36 @@
         });
 
         // Update booking status
-      async function updateStatus(id, status, phone, name){
+    async function updateStatus(id, status, phone, name){
 
-            const res = await fetch(`/update-status/${id}/${status}`, {
-                method: "POST"
-            });
+    // OPEN WHATSAPP FIRST
+    if(status === "Confirmed"){
+        openWhatsApp(phone, name);
+    }
 
-            const data = await res.json();
+    try{
 
-            if(data.success){
+        const res = await fetch(`/update-status/${id}/${status}`, {
+            method: "POST"
+        });
 
-                if(status === "Confirmed"){
-                    openWhatsApp(phone, name);
-                }
+        const data = await res.json();
 
-                location.reload();
-            }
+        if(data.success){
+
+            location.reload();
+
+        } else {
+
+            alert(data.message || "Failed to update status");
         }
+
+    } catch(error){
+
+        console.log("Error:", error);
+        alert("Something went wrong");
+    }
+}
 
         async function deleteBooking(id){
 

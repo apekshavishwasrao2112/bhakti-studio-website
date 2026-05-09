@@ -399,98 +399,141 @@ def dialogue_page():
 def social_page():
     return render_template('socialMedia.html')
 
-
 @app.route("/chat", methods=["POST"])
 def chat():
 
-    user_message = request.json["message"].lower()
-
-    if len(user_message) > 500:
-        return jsonify({"reply": "Message too long. Please keep it under 500 characters."})
-
-    reply = ""
-    
-    location_words = ["location","address","map","कुठे","लोकेशन","पत्ता"]
-    # PRICE
-    price_words = ["price","charges","cost","किंमत","पैसे","rate"]
-
-    # RICKSHAW
-    rickshaw_words = ["rickshaw","announcement","रिक्शा","रिक्षा","speaker","प्रचार" , "demo","playlist","songs","गाणी","डेमो","music"]
-
-   
-    # ---------------- PRICE ----------------
-    if any(word in user_message for word in price_words):
-
-        reply = """
-        💰 प्रचार गीत बनवण्याचे चार्जेस 🎵<br><br>
-
-        🎧 मोठी निवडणूक प्रचारगीतं 👇<br>
-        1 गाणं — ₹3,500<br>
-        2 गाणी — ₹6000<br>
-        3 गाणी — ₹9000<br><br>
-
-        🎬 नाव & चिन्हासह रील प्रचारगीतं 👇<br>
-        ₹2000 प्रति रील<br><br>
-
-        🔥 स्मार्ट सॉंग <br> 
-        ₹1500 प्रति गाणे<br>
-    """
-
-    # ---------------- RICKSHAW ----------------
-    elif any(word in user_message for word in rickshaw_words):
-
-        reply = """
-        🚕 रिक्षा अनाउन्समेंट चार्जेस 👇<br> <br>
-
-        🔶 ५ मिनिटांचा प्रीमियम प्रचार पॅकेज <br> 
-        💰 ₹6000<br><br>
-
-        🟧 2 - 2.30 मिनिटांचा प्रचार <br> 
-        💰 ₹3500 <br><br>
-
-        🟨 1.30 मिनिटांचा शॉर्ट प्रचार <br>  
-        💰 ₹2500 <br><br>
-
-        📞 बुकिंगसाठी कॉल करा  <br>
-        👉 9146940518<br><br>
-    """
-    elif any(word in user_message for word in location_words):
-
-       reply = """
-    📍 आमचे स्टुडिओ लोकेशन 👇 <br><br>
-
-    🎙 Bhakti Recording Studio  
-    Junnar, Pune <br><br>
-
-    <a href="https://www.google.com/maps?q=19.1138352,74.1761465" target="_blank" style="background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; padding: 10px 16px; border-radius: 25px; text-decoration: none; display: inline-block; font-weight: bold;">
-    📍 View Location
-    </a>
-    """  
-
-    else:
-
-        reply = "कृपया आपला प्रश्न स्पष्ट लिहा. Example: price / demo / रिक्षा"
-
-    # SAVE CHAT
     try:
-        conn = get_db_connection()
-        if conn is None:
-            print("[ERROR] Database not available to save chat history")
+        data = request.get_json()
+
+        if not data or "message" not in data:
+            return jsonify({"reply": "Invalid request"})
+
+        user_message = data["message"].lower().strip()
+
+        if len(user_message) > 500:
+            return jsonify({
+                "reply": "Message too long. Please keep under 500 characters."
+            })
+
+        reply = ""
+
+        location_words = ["location","address","map","कुठे","लोकेशन","पत्ता"]
+
+        price_words = ["price","charges","cost","किंमत","पैसे","rate"]
+
+        rickshaw_words = [
+            "rickshaw","announcement","रिक्शा","रिक्षा",
+            "speaker","प्रचार","demo","playlist",
+            "songs","गाणी","डेमो","music"
+        ]
+
+        # PRICE
+        if any(word in user_message for word in price_words):
+
+            reply = """
+            💰 प्रचार गीत बनवण्याचे चार्जेस 🎵<br><br>
+
+            🎧 मोठी निवडणूक प्रचारगीतं 👇<br>
+            1 गाणं — ₹3,500<br>
+            2 गाणी — ₹6000<br>
+            3 गाणी — ₹9000<br><br>
+
+            🎬 नाव & चिन्हासह रील प्रचारगीतं 👇<br>
+            ₹2000 प्रति रील<br><br>
+
+            🔥 स्मार्ट सॉंग <br> 
+            ₹1500 प्रति गाणे<br>
+            """
+
+        # RICKSHAW
+        elif any(word in user_message for word in rickshaw_words):
+
+            reply = """
+            🚕 रिक्षा अनाउन्समेंट चार्जेस 👇<br><br>
+
+            🔶 ५ मिनिटांचा प्रीमियम प्रचार पॅकेज <br> 
+            💰 ₹6000<br><br>
+
+            🟧 2 - 2.30 मिनिटांचा प्रचार <br> 
+            💰 ₹3500 <br><br>
+
+            🟨 1.30 मिनिटांचा शॉर्ट प्रचार <br>  
+            💰 ₹2500 <br><br>
+
+            📞 बुकिंगसाठी कॉल करा <br>
+            👉 9146940518<br><br>
+            """
+
+        # LOCATION
+        elif any(word in user_message for word in location_words):
+
+            reply = """
+            📍 आमचे स्टुडिओ लोकेशन 👇 <br><br>
+
+            🎙 Bhakti Recording Studio  
+            Junnar, Pune <br><br>
+
+            <a href="https://www.google.com/maps?q=19.1138352,74.1761465"
+            target="_blank"
+            style="background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white;
+            padding: 10px 16px;
+            border-radius: 25px;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: bold;">
+
+            📍 View Location
+            </a>
+            """
+
         else:
-            cursor = conn.cursor(buffered=True)
-            placeholder = get_param_style(conn)
 
-            cursor.execute(
-                f"INSERT INTO chat_history (user_message, bot_reply) VALUES ({placeholder}, {placeholder})",
-                (user_message, reply)
-            )
+            reply = """
+            कृपया प्रश्न स्पष्ट लिहा 🙏<br><br>
 
-            conn.commit()
-            conn.close()
+            Example:<br>
+            • price<br>
+            • location<br>
+            • demo<br>
+            • रिक्षा
+            """
+
+        # SAVE CHAT HISTORY
+        try:
+
+            conn = get_db_connection()
+
+            if conn:
+
+                cursor = conn.cursor()
+
+                cursor.execute(
+                    """
+                    INSERT INTO chat_history
+                    (user_message, bot_reply)
+                    VALUES (%s, %s)
+                    """,
+                    (user_message, reply)
+                )
+
+                conn.commit()
+
+                cursor.close()
+                conn.close()
+
+        except Exception as db_error:
+            print("Chat save error:", db_error)
+
+        return jsonify({"reply": reply})
+
     except Exception as e:
-        print(f"[ERROR] Database error in chat saving: {e}")
 
-    return jsonify({"reply": reply})
+        print("CHATBOT ERROR:", e)
+
+        return jsonify({
+            "reply": "Server error. Please try again."
+        })
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
