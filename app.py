@@ -182,37 +182,61 @@ def admin_logout():
     session.pop("admin", None)
     return redirect("/bhakti-secure-admin-portal-84729/login")
 
+
 @app.route("/update-status/<int:booking_id>/<status>", methods=["POST"])
 def update_status(booking_id, status):
-    if "admin" not in session:
-        return jsonify({"success": False, "message": "Unauthorized"}), 401
-
-    if status not in ['Pending', 'Confirmed', 'Completed', 'Rejected']:
-        return jsonify({"success": False, "message": "Invalid status"}), 400
-
-    conn = get_db_connection()
-    if conn is None:
-        return jsonify({"success": False, "message": "Database not available"}), 500
 
     try:
-        cursor = conn.cursor(buffered=True)
-        placeholder = get_param_style(conn)
+
+        if "admin" not in session:
+            return jsonify({
+                "success": False,
+                "message": "Unauthorized"
+            }), 401
+
+        if status not in ["Pending", "Confirmed", "Completed", "Rejected"]:
+            return jsonify({
+                "success": False,
+                "message": "Invalid status"
+            }), 400
+
+        conn = get_db_connection()
+
+        if conn is None:
+            return jsonify({
+                "success": False,
+                "message": "Database connection failed"
+            }), 500
+
+        cursor = conn.cursor()
 
         cursor.execute(
-            f"UPDATE bookings SET status = {placeholder} WHERE id = {placeholder}",
+            """
+            UPDATE bookings
+            SET status = %s
+            WHERE id = %s
+            """,
             (status, booking_id)
         )
 
         conn.commit()
+
+        cursor.close()
         conn.close()
 
-        return jsonify({"success": True, "message": f"Booking {status.lower()} successfully"})
+        return jsonify({
+            "success": True,
+            "message": f"Booking {status} successfully"
+        })
 
     except Exception as e:
-        print(f"Database error: {e}")
-        return jsonify({"success": False, "message": "Database error"}), 500
 
+        print("UPDATE STATUS ERROR:", e)
 
+        return jsonify({
+            "success": False,
+            "message": "Server error"
+        }), 500
 
 @app.route("/bhakti-secure-admin-portal-84729/website")
 def admin_website():
@@ -328,28 +352,46 @@ def booking():
 @app.route("/delete-booking/<int:id>", methods=["POST"])
 def delete_booking(id):
 
-    if "admin" not in session:
-        return jsonify({"success": False, "message": "Unauthorized"}), 401
-
-    conn = get_db_connection()
-    if conn is None:
-        return jsonify({"success": False, "message": "Database not available"}), 500
-
     try:
-        cursor = conn.cursor(buffered=True)
-        placeholder = get_param_style(conn)
 
-        cursor.execute(f"DELETE FROM bookings WHERE id = {placeholder}", (id,))
+        if "admin" not in session:
+            return jsonify({
+                "success": False,
+                "message": "Unauthorized"
+            }), 401
+
+        conn = get_db_connection()
+
+        if conn is None:
+            return jsonify({
+                "success": False,
+                "message": "Database connection failed"
+            }), 500
+
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "DELETE FROM bookings WHERE id = %s",
+            (id,)
+        )
+
         conn.commit()
+
+        cursor.close()
         conn.close()
 
-        return jsonify({"success": True, "message": "Booking deleted successfully"})
+        return jsonify({
+            "success": True
+        })
 
     except Exception as e:
-        print(f"Database error: {e}")
-        return jsonify({"success": False, "message": "Database error"}), 500
 
+        print("DELETE ERROR:", e)
 
+        return jsonify({
+            "success": False,
+            "message": "Server error"
+        }), 500
 
 @app.route("/")
 def client_dashboard():
