@@ -254,36 +254,37 @@
             });
         });
 
-    async function updateStatus(id, status, phone="", name="") {
+async function updateStatus(id, status, phone="", name=""){
 
-    try {
+    try{
 
         if(status === "Confirmed"){
             openWhatsApp(phone, name);
         }
 
-        const res = await fetch(`/update-status/${id}/${status}`,{
-            method:"POST"
+        const response = await fetch(`/update-status/${id}/${status}`, {
+            method: "POST"
         });
 
-        const data = await res.json();
+        const data = await response.json();
 
         if(data.success){
 
             alert(data.message);
 
-            location.reload();
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
 
-        } else {
-
+        }else{
             alert(data.message);
         }
 
-    } catch(error){
+    }catch(error){
 
         console.log(error);
 
-        alert("Something went wrong");
+        alert("Server error");
     }
 }
         async function deleteBooking(id){

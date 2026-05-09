@@ -495,47 +495,15 @@ def chat():
             • price<br>
             • demo
             """
-
-        # SAVE CHAT HISTORY
-        try:
-
-            conn = get_db_connection()
-
-            if conn:
-
-                cursor = conn.cursor()
-
-                sql = """
-                INSERT INTO chat_history
-                (user_message, bot_reply)
-                VALUES (%s, %s)
-                """
-
-                values = (user_message, reply)
-
-                cursor.execute(sql, values)
-
-                conn.commit()
-
-                cursor.close()
-                conn.close()
-
-        except Exception as db_error:
-
-            print("CHAT SAVE ERROR:", db_error)
-
-        return jsonify({
-            "reply": reply
-        })
+    return jsonify({"reply": reply})
 
     except Exception as e:
 
-        print("CHAT MAIN ERROR:", e)
+        print("CHATBOT ERROR:", e)
 
         return jsonify({
-            "reply": "Server error"
+            "reply": "⚠ Server error. Please try again."
         })
-
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
