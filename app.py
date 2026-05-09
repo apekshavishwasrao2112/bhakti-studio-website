@@ -188,36 +188,25 @@ def update_status(booking_id, status):
 
     try:
 
-        if "admin" not in session:
-            return jsonify({
-                "success": False,
-                "message": "Unauthorized"
-            }), 401
-
-        if status not in ["Pending", "Confirmed", "Completed", "Rejected"]:
-            return jsonify({
-                "success": False,
-                "message": "Invalid status"
-            }), 400
-
         conn = get_db_connection()
 
         if conn is None:
             return jsonify({
                 "success": False,
-                "message": "Database connection failed"
-            }), 500
+                "message": "Database failed"
+            })
 
         cursor = conn.cursor()
 
-        cursor.execute(
-            """
-            UPDATE bookings
-            SET status = %s
-            WHERE id = %s
-            """,
-            (status, booking_id)
-        )
+        sql = """
+        UPDATE bookings
+        SET status = %s
+        WHERE id = %s
+        """
+
+        values = (status, booking_id)
+
+        cursor.execute(sql, values)
 
         conn.commit()
 
@@ -226,7 +215,7 @@ def update_status(booking_id, status):
 
         return jsonify({
             "success": True,
-            "message": f"Booking {status} successfully"
+            "message": "Updated successfully"
         })
 
     except Exception as e:
@@ -235,8 +224,8 @@ def update_status(booking_id, status):
 
         return jsonify({
             "success": False,
-            "message": "Server error"
-        }), 500
+            "message": str(e)
+        })
 
 @app.route("/bhakti-secure-admin-portal-84729/website")
 def admin_website():
@@ -441,92 +430,59 @@ def dialogue_page():
 def social_page():
     return render_template('socialMedia.html')
 
+
 @app.route("/chat", methods=["POST"])
 def chat():
 
     try:
+
         data = request.get_json()
 
-        if not data or "message" not in data:
-            return jsonify({"reply": "Invalid request"})
-
-        user_message = data["message"].lower().strip()
-
-        if len(user_message) > 500:
+        if not data:
             return jsonify({
-                "reply": "Message too long. Please keep under 500 characters."
+                "reply": "No data received"
             })
 
-        reply = ""
+        user_message = data.get("message", "").lower().strip()
 
-        location_words = ["location","address","map","कुठे","लोकेशन","पत्ता"]
+        if user_message == "":
+            return jsonify({
+                "reply": "Empty message"
+            })
 
-        price_words = ["price","charges","cost","किंमत","पैसे","rate"]
-
-        rickshaw_words = [
-            "rickshaw","announcement","रिक्शा","रिक्षा",
-            "speaker","प्रचार","demo","playlist",
-            "songs","गाणी","डेमो","music"
-        ]
-
-        # PRICE
-        if any(word in user_message for word in price_words):
+        # ---------------- LOCATION ----------------
+        if user_message in ["location", "address", "map", "लोकेशन", "पत्ता"]:
 
             reply = """
-            💰 प्रचार गीत बनवण्याचे चार्जेस 🎵<br><br>
+            📍 Bhakti Recording Studio<br><br>
 
-            🎧 मोठी निवडणूक प्रचारगीतं 👇<br>
-            1 गाणं — ₹3,500<br>
-            2 गाणी — ₹6000<br>
-            3 गाणी — ₹9000<br><br>
+            Junnar, Pune<br><br>
 
-            🎬 नाव & चिन्हासह रील प्रचारगीतं 👇<br>
-            ₹2000 प्रति रील<br><br>
-
-            🔥 स्मार्ट सॉंग <br> 
-            ₹1500 प्रति गाणे<br>
-            """
-
-        # RICKSHAW
-        elif any(word in user_message for word in rickshaw_words):
-
-            reply = """
-            🚕 रिक्षा अनाउन्समेंट चार्जेस 👇<br><br>
-
-            🔶 ५ मिनिटांचा प्रीमियम प्रचार पॅकेज <br> 
-            💰 ₹6000<br><br>
-
-            🟧 2 - 2.30 मिनिटांचा प्रचार <br> 
-            💰 ₹3500 <br><br>
-
-            🟨 1.30 मिनिटांचा शॉर्ट प्रचार <br>  
-            💰 ₹2500 <br><br>
-
-            📞 बुकिंगसाठी कॉल करा <br>
-            👉 9146940518<br><br>
-            """
-
-        # LOCATION
-        elif any(word in user_message for word in location_words):
-
-            reply = """
-            📍 आमचे स्टुडिओ लोकेशन 👇 <br><br>
-
-            🎙 Bhakti Recording Studio  
-            Junnar, Pune <br><br>
-
-            <a href="https://www.google.com/maps?q=19.1138352,74.1761465"
-            target="_blank"
-            style="background: linear-gradient(45deg, #ff416c, #ff4b2b);
-            color: white;
-            padding: 10px 16px;
-            border-radius: 25px;
-            text-decoration: none;
-            display: inline-block;
-            font-weight: bold;">
+            <a href='https://www.google.com/maps?q=19.1138352,74.1761465'
+            target='_blank'>
 
             📍 View Location
             </a>
+            """
+
+        # ---------------- PRICE ----------------
+        elif user_message in ["price", "charges", "cost", "किंमत"]:
+
+            reply = """
+            💰 Price Details<br><br>
+
+            🎵 1 Song — ₹3500<br>
+            🎵 2 Songs — ₹6000<br>
+            🎵 Reel Song — ₹2000
+            """
+
+        # ---------------- DEMO ----------------
+        elif user_message in ["demo", "music", "song"]:
+
+            reply = """
+            🎧 Demo Available<br><br>
+
+            📞 Contact: 9146940518
             """
 
         else:
@@ -534,11 +490,10 @@ def chat():
             reply = """
             कृपया प्रश्न स्पष्ट लिहा 🙏<br><br>
 
-            Example:<br>
-            • price<br>
+            Try:<br>
             • location<br>
-            • demo<br>
-            • रिक्षा
+            • price<br>
+            • demo
             """
 
         # SAVE CHAT HISTORY
@@ -550,14 +505,15 @@ def chat():
 
                 cursor = conn.cursor()
 
-                cursor.execute(
-                    """
-                    INSERT INTO chat_history
-                    (user_message, bot_reply)
-                    VALUES (%s, %s)
-                    """,
-                    (user_message, reply)
-                )
+                sql = """
+                INSERT INTO chat_history
+                (user_message, bot_reply)
+                VALUES (%s, %s)
+                """
+
+                values = (user_message, reply)
+
+                cursor.execute(sql, values)
 
                 conn.commit()
 
@@ -565,17 +521,21 @@ def chat():
                 conn.close()
 
         except Exception as db_error:
-            print("Chat save error:", db_error)
 
-        return jsonify({"reply": reply})
+            print("CHAT SAVE ERROR:", db_error)
+
+        return jsonify({
+            "reply": reply
+        })
 
     except Exception as e:
 
-        print("CHATBOT ERROR:", e)
+        print("CHAT MAIN ERROR:", e)
 
         return jsonify({
-            "reply": "Server error. Please try again."
+            "reply": "Server error"
         })
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
