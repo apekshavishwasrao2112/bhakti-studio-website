@@ -254,38 +254,39 @@
             });
         });
 
-    async function updateStatus(id, status, phone="", name="") {
+   
 
-    try {
+        async function updateStatus(id, status, phone, name){
 
-        if(status === "Confirmed"){
-            openWhatsApp(phone, name);
-        }
+    if(status === "Confirmed"){
+        openWhatsApp(phone, name);
+    }
 
-        const res = await fetch(`/update-status/${id}/${status}`,{
-            method:"POST"
+    try{
+
+        const res = await fetch(`/update-status/${id}/${status}`, {
+            method: "POST"
         });
 
         const data = await res.json();
 
+        
         if(data.success){
-
-            alert(data.message);
 
             location.reload();
 
-        } else {
+        }else{
 
-            alert(data.message);
+            alert(data.message || "Error updating status");
         }
 
-    } catch(error){
+    }catch(error){
 
         console.log(error);
-
-        alert("Something went wrong");
+        alert("Server error");
     }
 }
+
         async function deleteBooking(id){
 
         let confirmDelete = confirm("Are you sure to delete this booking?");
@@ -340,10 +341,7 @@
             }
 
           let url = "https://wa.me/" + cleanPhone + "?text=" + encodeURIComponent(message);
-            window.open(url, "_blank");
-            // DEBUG (IMPORTANT)
-            console.log(url);
-
+           
             window.open(url, "_blank");
         }
 
