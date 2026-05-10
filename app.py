@@ -425,6 +425,7 @@ def social_page():
     return render_template('socialMedia.html')
 
 
+@csrf.exempt
 @app.route("/chat", methods=["POST"])
 def chat():
 

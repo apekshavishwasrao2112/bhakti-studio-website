@@ -16,7 +16,8 @@ def get_db_connection():
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
             database=os.getenv("DB_NAME"),
-            port=int(os.getenv("DB_PORT"))
+            port=int(os.getenv("DB_PORT")),
+            connection_timeout=10
         )
 
         return conn
@@ -31,8 +32,7 @@ def init():
     conn = get_db_connection()
 
     if conn is None:
-        print("[ERROR] Database connection failed")
-        return
+        return jsonify({"success": False, "message": "Database error"})
 
     cursor = conn.cursor()
 
