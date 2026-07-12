@@ -187,7 +187,7 @@ def admin_logout():
 def update_status(booking_id, status):
 
     if "admin" not in session:
-        return jsonify({"success": False})
+        return jsonify({"success": False}) 
 
     conn = get_db_connection()
 

@@ -193,9 +193,10 @@
                 Confirm
             </button>
 
-           <button onclick="updateStatus({{ booking[0] }}, 'Rejected', '', '')" class="action-btn reject">
-                Reject
-            </button>
+          <button onclick="updateStatus({{ booking[0] }}, 'Rejected', '{{ booking[2] }}', '{{ booking[1] }}')"
+                class="action-btn reject">
+            Reject
+        </button>
 
         {% elif booking[5] == 'Confirmed' %}
 
@@ -203,11 +204,12 @@
                 Complete
             </button>
 
-        {% elif booking[5] == 'Completed' %}
+        {% elif booking[5] == 'Completed' or booking[5] == 'Rejected' %}
 
-            <button onclick="deleteBooking({{ booking[0] }})" class="action-btn delete">
-                Delete
-            </button>
+        <button onclick="deleteBooking({{ booking[0] }})"
+                class="action-btn delete">
+            Delete
+        </button>
 
         {% endif %}
 
@@ -260,7 +262,11 @@
         async function updateStatus(id, status, phone, name){
 
     if(status === "Confirmed"){
-        openWhatsApp(phone, name);
+    openWhatsApp(phone, name);
+    }
+
+    if(status === "Rejected"){
+        openRejectWhatsApp(phone, name);
     }
 
     try{
@@ -314,6 +320,66 @@
             alert("Deleted successfully");
             location.reload();
         }
+    }
+
+        function openRejectWhatsApp(phone, name){
+
+        let cleanPhone = phone.replace(/\D/g, "");
+
+        if(cleanPhone.length === 10){
+            cleanPhone = "91" + cleanPhone;
+        }
+
+        let isMarathi = /[\u0900-\u097F]/.test(name);
+
+        let message;
+
+        if(isMarathi){
+
+            message = `🙏 नमस्कार ${name},
+
+    काही कारणास्तव तुमचे बुकिंग स्वीकारता आले नाही.
+
+    कृपया पुन्हा स्लॉट बुक करा किंवा आमच्याशी संपर्क साधा.
+
+    🌐 Website:
+    https://bhakti-studio-website-production.up.railway.app
+
+    📞 संपर्क:
+    9146940518
+
+    धन्यवाद.
+    Bhakti Studio 🎵`;
+
+        }else{
+
+            message = `Hello ${name},
+
+    We are sorry.
+
+    Your booking could not be accepted due to some reason.
+
+    Please visit our website and book another slot.
+
+    🌐 Website:
+    https://bhakti-studio-website-production.up.railway.app
+
+    📞 Contact:
+    9146940518
+
+    Thank you.
+    Bhakti Studio 🎵`;
+
+        }
+
+        let url =
+            "https://wa.me/" +
+            cleanPhone +
+            "?text=" +
+            encodeURIComponent(message);
+
+        window.open(url,"_blank");
+
     }
 
        function openWhatsApp(phone, name){
