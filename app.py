@@ -89,6 +89,13 @@ def db_test():
 
     return "DB FAILED"
 
+@app.route("/")
+def home():
+    return """
+    <h1>BHakti Studio - NEW DEPLOYMENT TEST</h1>
+    <p>Deployment version: 2026-09-21-TEST-1</p>
+    """
+
 @app.route("/bhakti-secure-admin-portal-84729/login", methods=["GET","POST"])
 def admin_login():
     if request.method == "POST":
