@@ -7,25 +7,52 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
+def _get_database_config():
+    """Read app-specific settings, falling back to linked Railway MySQL settings."""
+    host = os.getenv("DB_HOST") or os.getenv("MYSQLHOST")
+    user = os.getenv("DB_USER") or os.getenv("MYSQLUSER")
+    password = os.getenv("DB_PASSWORD") or os.getenv("MYSQLPASSWORD")
+    database = os.getenv("DB_NAME") or os.getenv("MYSQLDATABASE")
+    port_value = os.getenv("DB_PORT") or os.getenv("MYSQLPORT") or "3306"
+
+    try:
+        port = int(port_value)
+    except (TypeError, ValueError):
+        raise ValueError("DB_PORT/MYSQLPORT must be a valid integer")
+
+    missing = [
+        name for name, value in (
+            ("DB_HOST/MYSQLHOST", host),
+            ("DB_USER/MYSQLUSER", user),
+            ("DB_PASSWORD/MYSQLPASSWORD", password),
+            ("DB_NAME/MYSQLDATABASE", database),
+        )
+        if not value
+    ]
+    if missing:
+        raise ValueError("Missing database configuration: " + ", ".join(missing))
+
+    return {
+        "host": host,
+        "user": user,
+        "password": password,
+        "database": database,
+        "port": port,
+        "connection_timeout": 10,
+    }
+
+
 def get_param_style(conn):
     return "%s"
 
 
 def get_db_connection():
     try:
-        conn = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            database=os.getenv("DB_NAME"),
-            port=int(os.getenv("DB_PORT", 3306)),
-            connection_timeout=10
-        )
+        return mysql.connector.connect(**_get_database_config())
 
-        return conn
-
-    except Error as e:
-        print(f"[ERROR] MySQL connection failed: {e}")
+    except (Error, TypeError, ValueError) as e:
+        error_code = getattr(e, "errno", "configuration")
+        print(f"[ERROR] MySQL connection failed ({error_code}).")
         return None
 
 
@@ -37,6 +64,7 @@ def init():
         print("[ERROR] Database initialization failed.")
         return False
 
+    cursor = None
     try:
 
         cursor = conn.cursor()
@@ -132,24 +160,26 @@ def init():
 
         conn.commit()
 
-        cursor.close()
-        conn.close()
-
         print("[SUCCESS] MySQL Database Initialized")
 
         return True
 
-    except Error as e:
+    except (Error, TypeError, ValueError) as e:
 
-        print(f"[ERROR] Database initialization error: {e}")
+        error_code = getattr(e, "errno", "unknown")
+        print(f"[ERROR] Database initialization failed ({error_code}).")
 
         try:
             conn.rollback()
         except Exception:
             pass
 
+        return False
+
+    finally:
         try:
-            cursor.close()
+            if cursor is not None:
+                cursor.close()
         except Exception:
             pass
 
@@ -157,5 +187,3 @@ def init():
             conn.close()
         except Exception:
             pass
-
-        return False
