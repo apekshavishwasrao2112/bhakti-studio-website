@@ -1,145 +1,1285 @@
-  body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-        }
+/* =====================================================
+   BHAKTI STUDIO - PROFESSIONAL HOMEPAGE
+===================================================== */
 
-        .hero {
-            background: url("{{ url_for('static', filename='images/welimg.jpg') }}") no-repeat center center/cover;
-            height: 100vh;
-            position: relative;
-            color: white;
-        }
-
-        .overlay {
-            background: rgba(0, 0, 0, 0.65);
-            height: 100%;
-            width: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            top: 40%;
-            transform: translateY(-40%);
-        }
-
-        .cards-section {
-            background: #f8f9fa;
-            padding: 60px 20px;
-        }
-
-        .card {
-            transition: 0.3s;
-            cursor: pointer;
-        }
-
-        .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-        }
-
-        footer {
-            background: #111;
-            color: white;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .insta-icon {
-        color: #ea234b;
-        font-size: 40px;
-       font-size: 25px;
-    }
-        .yt-icon {
-        color: #f00e0e;
-        font-size: 40px;
-       font-size: 25px;
-    }
-    .blinking-btn {
-    font-family: emoji;
-    animation: glowEffect 1s infinite alternate;
-    }
-
-    @keyframes glowEffect {
-        from {
-            box-shadow: 0 0 5px #ffc107;
-        }
-        to {
-            box-shadow: 0 0 20px #ff9800;
-        }
-    }
-
-    /*------------ section 2 ------------ Demo*/
-
-/* Section Background */
-.cards-section {
-    padding: 80px 0;
+* {
+    box-sizing: border-box;
 }
 
-/* Remove link styling */
-.card-link {
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+
+    font-family: "DM Sans", sans-serif;
+
+    background: #070707;
+
+    color: white;
+
+    overflow-x: hidden;
+}
+
+
+/* =====================================================
+   NAVBAR
+===================================================== */
+
+.studio-navbar {
+
+    position: absolute;
+
+    top: 0;
+    left: 0;
+
+    width: 100%;
+
+    z-index: 100;
+
+    padding: 22px 0;
+}
+
+
+.navbar-inner {
+
+    width: 90%;
+
+    max-width: 1250px;
+
+    margin: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+}
+
+
+/* LOGO */
+
+.studio-logo {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
     text-decoration: none;
-    color: inherit;
-}
 
-/* Card Styling */
-.demo-card {
-    border-radius: 18px;
-    padding: 30px;
-    transition: all 0.4s ease;
-    cursor: pointer;
-    background: white;
-}
+    color: white;
 
-/* Hover Animation */
-.demo-card:hover {
-    transform: translateY(-12px) scale(1.04);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-}
-
-/* Click Effect */
-.demo-card:active {
-    transform: scale(0.96);
-}
-
-/* Title Styling */
-.demo-card .card-title {
-    font-weight: 600;
-    font-size: 18px;
-    transition: color 0.3s ease;
-}
-
-/* Title Hover Color */
-.demo-card:hover .card-title {
-    color: #ffc107;
-}
-
-/* Smooth Glow Pulse */
-.demo-card {
-    animation: glowPulse 3s infinite alternate;
-}
-
-@keyframes glowPulse {
-    from {
-        box-shadow: 0 0 8px rgba(255,193,7,0.2);
-    }
-    to {
-        box-shadow: 0 0 25px rgba(255,193,7,0.5);
-    }
-}
-
-
-.demo-heading {
     font-weight: 700;
-    background: linear-gradient(90deg, #ffc107, #ff9800, #ff5722);
-    
-    background-clip: text;              /* Standard property */
-    -webkit-background-clip: text;      /* Chrome / Safari support */
-    
-    color: transparent;                 /* Standard way */
-    -webkit-text-fill-color: transparent;
+
+    letter-spacing: 1.5px;
+
+    font-size: 16px;
+
+    transition: 0.3s;
+}
+
+
+.studio-logo:hover {
+
+    color: white;
+
+    transform: translateY(-2px);
+}
+
+
+.studio-logo img {
+
+    width: 52px;
+
+    height: 52px;
+
+    object-fit: contain;
+
+    filter:
+        drop-shadow(
+            0 5px 15px
+            rgba(0,0,0,0.5)
+        );
+}
+
+
+/* NAV LINKS */
+
+.nav-links {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+}
+
+
+.nav-links a {
+
+    text-decoration: none;
+
+    color:
+        rgba(255,255,255,0.85);
+
+    padding: 10px 18px;
+
+    border-radius: 30px;
+
+    font-size: 14px;
+
+    font-weight: 500;
+
+    transition: 0.3s;
+}
+
+
+.nav-links a:hover {
+
+    background:
+        rgba(255,255,255,0.12);
+
+    color: white;
+
+    transform:
+        translateY(-2px);
+}
+
+
+.nav-links a:last-child {
+
+    background:
+        linear-gradient(
+            135deg,
+            #c72c17,
+            #ff5733
+        );
+
+    color: white;
+
+    box-shadow:
+        0 8px 20px
+        rgba(199,44,23,0.3);
+}
+
+
+/* =====================================================
+   HERO
+===================================================== */
+
+.hero {
+
+    min-height: 100vh;
+
+    position: relative;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    text-align: center;
+
+    background-image:
+        url("../images/welimg.jpg");
+
+    background-size: cover;
+
+    background-position: center;
+
+    background-attachment: fixed;
+
+    overflow: hidden;
+}
+
+
+/* DARK OVERLAY */
+
+.hero-overlay {
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+
+        linear-gradient(
+            180deg,
+            rgba(0,0,0,0.72),
+            rgba(0,0,0,0.48) 45%,
+            rgba(0,0,0,0.88)
+        );
+}
+
+
+/* =====================================================
+   GLOW EFFECTS
+===================================================== */
+
+.glow {
+
+    position: absolute;
+
+    border-radius: 50%;
+
+    filter: blur(80px);
+
+    pointer-events: none;
+
+    animation:
+        floatingGlow 7s
+        ease-in-out infinite
+        alternate;
+}
+
+
+.glow-one {
+
+    width: 300px;
+
+    height: 300px;
+
+    background:
+        rgba(255,70,30,0.18);
+
+    top: 20%;
+
+    left: 5%;
+}
+
+
+.glow-two {
+
+    width: 350px;
+
+    height: 350px;
+
+    background:
+        rgba(160,60,255,0.13);
+
+    bottom: 5%;
+
+    right: 5%;
+
+    animation-delay: 2s;
+}
+
+
+@keyframes floatingGlow {
+
+    from {
+
+        transform:
+            translate(0,0)
+            scale(1);
+
+    }
+
+    to {
+
+        transform:
+            translate(30px,-25px)
+            scale(1.15);
+
+    }
+}
+
+
+/* =====================================================
+   HERO CONTENT
+===================================================== */
+
+.hero-content {
+
+    position: relative;
+
+    z-index: 5;
+
+    width: 90%;
+
+    max-width: 900px;
+
+    margin-top: 50px;
+
+    animation:
+        heroAppear 1.2s
+        ease forwards;
+}
+
+
+@keyframes heroAppear {
+
+    from {
+
+        opacity: 0;
+
+        transform:
+            translateY(35px);
+
+    }
+
+    to {
+
+        opacity: 1;
+
+        transform:
+            translateY(0);
+
+    }
+}
+
+
+/* =====================================================
+   STUDIO LABEL
+===================================================== */
+
+.studio-label {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 8px 16px;
+
+    border-radius: 50px;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+    backdrop-filter:
+        blur(12px);
+
+    font-size: 11px;
+
+    letter-spacing: 2px;
+
+    color:
+        rgba(255,255,255,0.8);
+
+    margin-bottom: 25px;
+}
+
+
+.pulse-dot {
+
+    width: 7px;
+
+    height: 7px;
+
+    background: #ff5733;
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 0 15px
+        #ff5733;
+
+    animation:
+        pulse 1.5s
+        infinite;
+}
+
+
+@keyframes pulse {
+
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.4;
+        transform: scale(1.5);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+
+/* =====================================================
+   MAIN HEADING
+===================================================== */
+
+.hero-content h1 {
+
+    margin: 0;
+
+    font-family:
+        "Playfair Display",
+        serif;
+
+    font-size:
+        clamp(3.5rem, 8vw, 7rem);
+
+    line-height: 0.98;
+
+    font-weight: 700;
+
+    letter-spacing: -3px;
+
+    text-shadow:
+        0 10px 40px
+        rgba(0,0,0,0.7);
+}
+
+
+.hero-content h1 span {
+
+    background:
+        linear-gradient(
+            90deg,
+            #ffb347,
+            #ff5733,
+            #ff9a76
+        );
+
+    -webkit-background-clip: text;
+
+    background-clip: text;
+
+    color: transparent;
+
+    background-size: 200% auto;
+
+    animation:
+        gradientMove 4s
+        linear infinite;
+}
+
+
+@keyframes gradientMove {
+
+    to {
+        background-position:
+            200% center;
+    }
+}
+
+
+/* =====================================================
+   DESCRIPTION
+===================================================== */
+
+.hero-description {
+
+    max-width: 650px;
+
+    margin:
+        25px auto 0;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+
+    color:
+        rgba(255,255,255,0.78);
+}
+
+
+/* =====================================================
+   BOOK BUTTON
+===================================================== */
+
+.hero-actions {
+
+    margin-top: 32px;
+}
+
+
+.book-btn {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding:
+        16px 28px;
+
+    border-radius: 50px;
+
+    text-decoration: none;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    background:
+        linear-gradient(
+            135deg,
+            #c72c17,
+            #ff5733
+        );
+
+    box-shadow:
+        0 12px 35px
+        rgba(199,44,23,0.35);
+
+    transition:
+        transform 0.3s,
+        box-shadow 0.3s;
+}
+
+
+.book-btn:hover {
+
+    color: white;
+
+    transform:
+        translateY(-5px);
+
+    box-shadow:
+        0 18px 45px
+        rgba(199,44,23,0.55);
+}
+
+
+.arrow {
+
+    transition:
+        transform 0.3s;
+}
+
+
+.book-btn:hover .arrow {
+
+    transform:
+        translateX(5px);
+}
+
+
+/* ================= HOME BUTTON AREA ================= */
+
+.home-buttons {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 42px;
+}
+
+
+/* ================= BOOKING BUTTON ================= */
+
+.main-book-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 250px;
+    padding: 15px 32px;
+
+    background: #c72c17;
+    color: #ffffff;
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 8px;
+
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+
+    text-decoration: none;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+
+    transition: all 0.25s ease;
+}
+
+.main-book-btn:hover {
+    background: #e03b23;
+    color: #ffffff;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+
+/* ================= DEMO SECTION ================= */
+
+.demo-section {
+    width: 100%;
+    max-width: 650px;
+
+    text-align: center;
+}
+
+
+/* ================= DEMO TITLE ================= */
+
+.demo-title {
+    margin: 0;
+
+    color: #ffffff;
+
+    font-size: 22px;
+    font-weight: 600;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* ================= DEMO SUBTITLE ================= */
+
+.demo-subtitle {
+    margin: 8px 0 24px;
+
+    color: rgba(255, 255, 255, 0.65);
+
+    font-size: 14px;
+    font-weight: 400;
+}
+
+
+/* ================= LANGUAGE BUTTONS ================= */
+
+.demo-language-buttons {
+    display: flex;
+    justify-content: center;
+
+    gap: 16px;
+
+    width: 100%;
+}
+
+
+/* ================= LANGUAGE BUTTON ================= */
+
+.language-demo-btn {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    width: 260px;
+
+    padding: 16px 20px;
+
+    background: rgba(255, 255, 255, 0.08);
+
+    border: 1px solid rgba(255, 255, 255, 0.22);
+
+    border-radius: 8px;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    transition: all 0.25s ease;
+}
+
+
+/* ================= BUTTON TEXT ================= */
+
+.btn-title {
+    font-size: 15px;
+    font-weight: 600;
+
+    letter-spacing: 0.3px;
+}
+
+
+/* ================= ARROW ================= */
+
+.btn-arrow {
+    font-size: 20px;
+
+    color: rgba(255, 255, 255, 0.7);
+
+    transition: transform 0.25s ease;
+}
+
+
+/* ================= HINDI ================= */
+
+.hindi-btn:hover {
+    background: rgba(255, 153, 51, 0.15);
+
+    border-color: rgba(255, 153, 51, 0.7);
+
+    transform: translateY(-2px);
+}
+
+.hindi-btn:hover .btn-arrow {
+    transform: translateX(5px);
+}
+
+
+/* ================= MARATHI ================= */
+
+.marathi-btn:hover {
+    background: rgba(255, 193, 7, 0.12);
+
+    border-color: rgba(255, 193, 7, 0.7);
+
+    transform: translateY(-2px);
+}
+
+.marathi-btn:hover .btn-arrow {
+    transform: translateX(5px);
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 576px) {
+
+    .home-buttons {
+        margin-top: 30px;
+        gap: 35px;
+    }
+
+    .main-book-btn {
+        width: 90%;
+        max-width: 300px;
+    }
+
+    .demo-section {
+        width: 90%;
+    }
+
+    .demo-title {
+        font-size: 20px;
+    }
+
+    .demo-subtitle {
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    .demo-language-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .language-demo-btn {
+        width: 100%;
+        max-width: 320px;
+    }
+}
+
+
+/* =====================================================
+   DEMO SELECTION
+===================================================== */
+
+.demo-selection {
+
+    margin-top: 38px;
+}
+
+
+.demo-selection > p {
+
+    margin-bottom: 15px;
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 2px;
+
+    color:
+        rgba(255,255,255,0.5);
+}
+
+
+/* =====================================================
+   LANGUAGE BUTTONS
+===================================================== */
+
+.language-buttons {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 15px;
+
+    flex-wrap: wrap;
+}
+
+
+.language-card {
+
+    width: 245px;
+
+    min-height: 75px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    padding: 13px 16px;
+
+    border-radius: 16px;
+
+    text-decoration: none;
+
+    color: white;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    border:
+        1px solid
+        rgba(255,255,255,0.18);
+
+    backdrop-filter:
+        blur(15px);
+
+    transition:
+        transform 0.35s,
+        background 0.35s,
+        border 0.35s,
+        box-shadow 0.35s;
+}
+
+
+.language-card:hover {
+
+    color: white;
+
+    transform:
+        translateY(-7px);
+
+    background:
+        rgba(255,255,255,0.15);
+
+    box-shadow:
+        0 15px 35px
+        rgba(0,0,0,0.35);
+}
+
+
+.hindi-card:hover {
+
+    border-color:
+        rgba(255,153,51,0.8);
+}
+
+
+.marathi-card:hover {
+
+    border-color:
+        rgba(255,215,0,0.8);
+}
+
+
+/* LANGUAGE ICON */
+
+.language-icon {
+
+    width: 45px;
+
+    height: 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background:
+        rgba(255,255,255,0.1);
+
+    font-size: 24px;
+
+    flex-shrink: 0;
+}
+
+
+/* LANGUAGE TEXT */
+
+.language-text {
+
+    flex: 1;
+
+    text-align: left;
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+
+.language-text strong {
+
+    font-size: 16px;
+}
+
+
+.language-text small {
+
+    color:
+        rgba(255,255,255,0.5);
+
+    font-size: 11px;
+}
+
+
+.language-arrow {
+
+    font-size: 20px;
+
+    color:
+        rgba(255,255,255,0.6);
+
+    transition:
+        transform 0.3s;
+}
+
+
+.language-card:hover
+.language-arrow {
+
+    transform:
+        translateX(5px);
+
+    color: white;
+}
+
+
+/* =====================================================
+   SCROLL INDICATOR
+===================================================== */
+
+.scroll-indicator {
+
+    position: absolute;
+
+    bottom: 25px;
+
+    left: 50%;
+
+    transform:
+        translateX(-50%);
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 7px;
+
+    color:
+        rgba(255,255,255,0.45);
+
+    font-size: 9px;
+
+    letter-spacing: 2px;
+}
+
+
+.scroll-line {
+
+    width: 1px;
+
+    height: 35px;
+
+    background:
+        linear-gradient(
+            white,
+            transparent
+        );
+
+    animation:
+        scrollDown 1.7s
+        infinite;
+}
+
+
+@keyframes scrollDown {
+
+    0% {
+
+        opacity: 0;
+
+        transform:
+            translateY(-5px);
+
+    }
+
+    50% {
+
+        opacity: 1;
+
+    }
+
+    100% {
+
+        opacity: 0;
+
+        transform:
+            translateY(8px);
+
+    }
+}
+
+
+/* =====================================================
+   QUICK INFO
+===================================================== */
+
+.quick-info {
+
+    background:
+        #0b0b0b;
+
+    border-top:
+        1px solid
+        rgba(255,255,255,0.08);
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,0.08);
+
+    padding:
+        25px 15px;
+}
+
+
+.info-container {
+
+    max-width: 900px;
+
+    margin: auto;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 35px;
+}
+
+
+.info-item {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+}
+
+
+.info-icon {
+
+    font-size: 25px;
+}
+
+
+.info-item strong {
+
+    display: block;
+
+    font-size: 13px;
+}
+
+
+.info-item small {
+
+    display: block;
+
+    margin-top: 3px;
+
+    color:
+        rgba(255,255,255,0.45);
+
+    font-size: 10px;
+}
+
+
+.info-divider {
+
+    width: 1px;
+
+    height: 35px;
+
+    background:
+        rgba(255,255,255,0.15);
+}
+
+
+/* =====================================================
+   FOOTER
+===================================================== */
+
+footer {
+
+    background:
+        #050505;
+
+    text-align: center;
+
+    padding:
+        25px 10px;
+}
+
+
+footer p {
+
+    margin: 5px;
+
+    color:
+        rgba(255,255,255,0.65);
+
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+
+    .studio-navbar {
+
+        padding: 15px 0;
+    }
+
+
+    .navbar-inner {
+
+        width: 92%;
+    }
+
+
+    .studio-logo img {
+
+        width: 42px;
+
+        height: 42px;
+    }
+
+
+    .studio-logo span {
+
+        font-size: 13px;
+    }
+
+
+    .nav-links {
+
+        gap: 2px;
+    }
+
+
+    .nav-links a {
+
+        padding:
+            8px 10px;
+
+        font-size: 12px;
+    }
+
+
+    .hero-content {
+
+        margin-top: 70px;
+    }
+
+
+    .hero-content h1 {
+
+        letter-spacing: -1px;
+    }
+
+
+    .hero-description {
+
+        font-size: 14px;
+    }
+
+
+    .language-card {
+
+        width: min(330px, 90vw);
+    }
+
+
+    .info-container {
+
+        flex-direction: column;
+
+        gap: 18px;
+    }
+
+
+    .info-divider {
+
+        width: 80px;
+
+        height: 1px;
+    }
+
+
+    .scroll-indicator {
+
+        display: none;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .nav-links a:nth-child(2) {
+
+        display: none;
+    }
+
+
+    .studio-label {
+
+        font-size: 9px;
+
+        letter-spacing: 1.3px;
+    }
+
+
+    .hero-content h1 {
+
+        font-size: 3.1rem;
+    }
+
+
+    .book-btn {
+
+        width: 90%;
+
+        justify-content: center;
+    }
 }

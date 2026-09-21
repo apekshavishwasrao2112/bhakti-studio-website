@@ -1,296 +1,956 @@
-<!-- CHAT BUTTON -->
+<!-- ================= CHATBOT ================= -->
+
 <div id="chatButton">
-    <img src="{{ url_for('static', filename='images/LogoBhakti.png') }}" alt="logo">
+    <img
+        src="{{ url_for('static', filename='images/LogoBhakti.png') }}"
+        alt="Bhakti Studio"
+    >
 </div>
 
-<!-- CHAT BOX -->
-<div id="chatBox" style="display:none;">
 
+<div id="chatBox">
+
+    <!-- HEADER -->
     <div id="chatHeader">
-        🎙 Studio Assistant
+        <span id="chatTitle">Bhakti Studio</span>
+
+        <button id="closeChat" type="button">
+            ×
+        </button>
     </div>
 
+
+    <!-- MESSAGES -->
     <div id="chatMessages"></div>
 
+
+    <!-- INPUT -->
     <div id="chatInputArea">
-        <input type="text" id="userInput" placeholder="Type message...">
-        <button id="sendBtn">Send</button>
+
+        <input
+            type="text"
+            id="userInput"
+            placeholder="Type your question..."
+            autocomplete="off"
+        >
+
+        <button id="sendBtn" type="button">
+            ➤
+        </button>
+
     </div>
 
 </div>
+
 
 <style>
 
-/* CHAT BUTTON */
-#chatButton{
-position:fixed;
-bottom:20px;
-right:20px;
-width:70px;
-height:70px;
-border-radius:50%;
-overflow:hidden;
-cursor:pointer;
-z-index:9999;
-animation:blink 1.5s infinite;
-background:white;
+/* =========================================================
+   CHAT BUTTON
+========================================================= */
+
+#chatButton {
+    position: fixed;
+
+    right: 22px;
+    bottom: 22px;
+
+    width: 72px;
+    height: 72px;
+
+    z-index: 9999;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    animation: logoPulse 2s infinite;
 }
 
-#chatButton img{
-width:100%;
-height:100%;
-object-fit:cover;
-border-radius:50%;
+
+/* ORIGINAL LOGO SHAPE */
+
+#chatButton img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    display: block;
+
+    background: transparent;
+
+    border: none;
+
+    border-radius: 0;
 }
 
-/* BLINK EFFECT */
-@keyframes blink{
-0%{box-shadow:0 0 0 0 rgba(255,0,0,0.7);}
-70%{box-shadow:0 0 0 15px rgba(255,0,0,0);}
-100%{box-shadow:0 0 0 0 rgba(255,0,0,0);}
+
+/* LOGO GLOW */
+
+@keyframes logoPulse {
+
+    0% {
+        filter: drop-shadow(0 0 0 rgba(255, 193, 7, 0.2));
+        transform: scale(1);
+    }
+
+    50% {
+        filter: drop-shadow(0 0 14px rgba(255, 193, 7, 0.8));
+        transform: scale(1.05);
+    }
+
+    100% {
+        filter: drop-shadow(0 0 0 rgba(255, 193, 7, 0.2));
+        transform: scale(1);
+    }
+
 }
 
-/* CHAT BOX */
-#chatBox{
-position:fixed;
-bottom:100px;
-right:20px;
-width:320px;
-background:white;
-border-radius:12px;
-box-shadow:0 5px 20px rgba(0,0,0,0.3);
-z-index:9999;
-font-family:Arial;
-overflow:hidden;
+
+/* =========================================================
+   CHAT BOX
+========================================================= */
+
+#chatBox {
+
+    display: none;
+
+    position: fixed;
+
+    right: 22px;
+    bottom: 108px;
+
+    width: 350px;
+    max-width: calc(100vw - 30px);
+
+    height: 500px;
+
+    background: #111;
+
+    border: 1px solid rgba(255, 193, 7, 0.35);
+
+    border-radius: 16px;
+
+    overflow: hidden;
+
+    z-index: 9999;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.65);
+
 }
 
-/* HEADER */
-#chatHeader{
-background: linear-gradient(45deg, #ff416c, #ff4b2b);
-color:white;
-padding:12px;
-font-weight:bold;
-text-align:center;
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#chatHeader {
+
+    height: 58px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    padding: 0 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #171717,
+            #242424
+        );
+
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+
+    color: white;
+
+    font-weight: 600;
+
 }
 
-/* MESSAGES */
-#chatMessages{
-height:230px;
-overflow-y:auto;
-padding:10px;
-font-size:14px;
-color:black;
+
+#chatTitle {
+
+    font-size: 16px;
+
+    letter-spacing: 0.3px;
+
 }
 
-/* INPUT AREA */
-#chatInputArea{
-display:flex;
-border-top:1px solid #ddd;
+
+#closeChat {
+
+    border: none;
+
+    background: transparent;
+
+    color: rgba(255,255,255,0.7);
+
+    font-size: 28px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
 }
 
-#userInput{
-flex:1;
-padding:10px;
-border:none;
-outline:none;
+
+#closeChat:hover {
+
+    color: white;
+
+    transform: scale(1.1);
+
 }
 
-#chatInputArea button{
-background: linear-gradient(45deg, #ff416c, #ff4b2b);
-color:white;
-border:none;
-padding:10px 15px;
-cursor:pointer;
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+#chatMessages {
+
+    height: calc(100% - 118px);
+
+    overflow-y: auto;
+
+    padding: 15px;
+
+    background:
+        radial-gradient(
+            circle at top,
+            #1b1b1b,
+            #0d0d0d
+        );
+
 }
 
-#chatInputArea button:hover{
-background: linear-gradient(45deg, #ff416c, #ff4b2b);
+
+/* SCROLLBAR */
+
+#chatMessages::-webkit-scrollbar {
+    width: 5px;
 }
 
-/* CHAT BUBBLES */
-.userMsg{
-text-align:right;
-margin:8px 0;
+#chatMessages::-webkit-scrollbar-thumb {
+    background: rgba(255,193,7,0.5);
+    border-radius: 10px;
 }
 
-.userMsg span{
-background: linear-gradient(45deg, #ff416c, #ff4b2b);
-color:white;
-padding:8px 12px;
-border-radius:15px 15px 0 15px;
-display:inline-block;
+
+/* =========================================================
+   BOT MESSAGE
+========================================================= */
+
+.botMsg {
+
+    text-align: left;
+
+    margin-bottom: 12px;
+
 }
 
-.botMsg{
-text-align:left;
-margin:8px 0;
+
+.botMsg span {
+
+    display: inline-block;
+
+    max-width: 90%;
+
+    padding: 11px 14px;
+
+    background: #242424;
+
+    color: rgba(255,255,255,0.92);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    border-radius: 4px 14px 14px 14px;
+
+    font-size: 14px;
+
+    line-height: 1.55;
+
 }
 
-.botMsg span{
-background:#f1f1f1;
-padding:8px 12px;
-border-radius:15px 15px 15px 0;
-display:inline-block;
+
+/* =========================================================
+   USER MESSAGE
+========================================================= */
+
+.userMsg {
+
+    text-align: right;
+
+    margin-bottom: 12px;
+
 }
 
-/* QUICK BUTTONS */
-.quickBtn{
-margin:5px 3px;
-padding:6px 10px;
-border:none;
-border-radius:15px;
-background:#eee;
-cursor:pointer;
+
+.userMsg span {
+
+    display: inline-block;
+
+    max-width: 85%;
+
+    padding: 10px 14px;
+
+    background: #c72c17;
+
+    color: white;
+
+    border-radius: 14px 4px 14px 14px;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
 }
 
-.quickBtn:hover{
-background:#ddd;
+
+/* =========================================================
+   QUICK BUTTONS
+========================================================= */
+
+.quickBtn {
+
+    display: inline-block;
+
+    margin: 4px 3px;
+
+    padding: 7px 11px;
+
+    background: rgba(255,193,7,0.08);
+
+    border: 1px solid rgba(255,193,7,0.35);
+
+    color: #ffc107;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
 }
 
-/* TYPING */
-.typing{
-font-size:12px;
-color:gray;
-margin:5px;
+
+.quickBtn:hover {
+
+    background: rgba(255,193,7,0.18);
+
+    border-color: #ffc107;
+
+}
+
+
+/* =========================================================
+   INPUT AREA
+========================================================= */
+
+#chatInputArea {
+
+    height: 60px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 8px;
+
+    background: #151515;
+
+    border-top: 1px solid rgba(255,255,255,0.1);
+
+}
+
+
+#userInput {
+
+    flex: 1;
+
+    height: 42px;
+
+    padding: 0 13px;
+
+    border: 1px solid rgba(255,255,255,0.15);
+
+    border-radius: 8px;
+
+    outline: none;
+
+    background: #202020;
+
+    color: white;
+
+    font-size: 13px;
+
+}
+
+
+#userInput::placeholder {
+
+    color: rgba(255,255,255,0.45);
+
+}
+
+
+#userInput:focus {
+
+    border-color: rgba(255,193,7,0.6);
+
+}
+
+
+#sendBtn {
+
+    width: 42px;
+
+    height: 42px;
+
+    border: none;
+
+    border-radius: 8px;
+
+    background: #c72c17;
+
+    color: white;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+#sendBtn:hover {
+
+    background: #e03b23;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* =========================================================
+   TYPING
+========================================================= */
+
+.typing {
+
+    color: rgba(255,255,255,0.45);
+
+    font-size: 12px;
+
+    margin: 5px 0 10px;
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 576px) {
+
+    #chatButton {
+
+        width: 62px;
+        height: 62px;
+
+        right: 15px;
+        bottom: 15px;
+
+    }
+
+
+    #chatBox {
+
+        right: 10px;
+        bottom: 90px;
+
+        width: calc(100vw - 20px);
+
+        height: 470px;
+
+    }
+
 }
 
 </style>
 
+
 <script>
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", function () {
 
-let button = document.getElementById("chatButton");
-let box = document.getElementById("chatBox");
-let chat = document.getElementById("chatMessages");
-let input = document.getElementById("userInput");
-let sendBtn = document.getElementById("sendBtn");
-
-
-button.onclick = function(){
-
-box.style.display = box.style.display === "none" ? "block" : "none";
-
-if(chat.innerHTML===""){
-
-chat.innerHTML = `
-<div class="botMsg">
-<span>
-🙏 नमस्कार! <br>
-🎙 भक्ती स्टुडिओ मध्ये आपले हार्दिक स्वागत! 💫 <br><br>
-
-👇 खालील पर्याय निवडा 👇<br><br>
-
-<button class="quickBtn" onclick="quickMsg('location')">📍 Location</button>
-<button class="quickBtn" onclick="quickMsg('price')">💰 Price</button>
-<button class="quickBtn" onclick="quickMsg('demo')">🎧 Demo</button>
-<a href="/booking">
-<button style="background:#c72c17;color:white;padding:10px;border:none;border-radius:10px;">
-📅 Book Now
-</button>
-</a>
-</span>
-</div>
-`;
-
-}
-
-};
+    const chatButton = document.getElementById("chatButton");
+    const chatBox = document.getElementById("chatBox");
+    const chat = document.getElementById("chatMessages");
+    const input = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const closeChat = document.getElementById("closeChat");
 
 
-input.addEventListener("keypress", function(e){
-if(e.key === "Enter"){
-sendMessage();
-}
+    /* =====================================================
+       DETECT LANGUAGE
+    ===================================================== */
+
+    const currentPath = window.location.pathname.toLowerCase();
+
+    let language = "marathi";
+
+    if (currentPath.includes("hindi")) {
+        language = "hindi";
+    }
+
+
+    /* =====================================================
+       OPEN CHAT
+    ===================================================== */
+
+    chatButton.addEventListener("click", function () {
+
+        if (chatBox.style.display === "block") {
+            chatBox.style.display = "none";
+            return;
+        }
+
+        chatBox.style.display = "block";
+
+        if (chat.innerHTML.trim() === "") {
+            showWelcomeMessage();
+        }
+
+        setTimeout(function () {
+            input.focus();
+        }, 100);
+
+    });
+
+
+    /* =====================================================
+       CLOSE CHAT
+    ===================================================== */
+
+    if (closeChat) {
+
+        closeChat.addEventListener("click", function () {
+            chatBox.style.display = "none";
+        });
+
+    }
+
+
+    /* =====================================================
+       WELCOME MESSAGE
+    ===================================================== */
+
+    function showWelcomeMessage() {
+
+        if (language === "hindi") {
+
+            chat.innerHTML = `
+                <div class="botMsg">
+                    <span>
+
+                        🙏 नमस्कार!<br><br>
+
+                        हिंदी डेमो के बारे में कोई भी सवाल पूछ सकते हैं।<br><br>
+
+                        <button class="quickBtn" onclick="quickMsg('demo')">
+                            🎧 डेमो
+                        </button>
+
+                        <button class="quickBtn" onclick="quickMsg('booking')">
+                            📅 बुकिंग
+                        </button>
+
+                        <button class="quickBtn" onclick="quickMsg('price')">
+                            💰 कीमत
+                        </button>
+
+                        <button class="quickBtn" onclick="quickMsg('location')">
+                            📍 लोकेशन
+                        </button>
+
+                    </span>
+                </div>
+            `;
+
+        } else {
+
+            chat.innerHTML = `
+                <div class="botMsg">
+                    <span>
+
+                        🙏 नमस्कार!<br><br>
+
+                        भक्ती स्टुडिओमध्ये आपले स्वागत आहे!<br><br>
+
+                        मराठी डेमोबद्दल कोणताही प्रश्न विचारू शकता.<br><br>
+
+                        <button class="quickBtn" onclick="quickMsg('demo')">
+                            🎧 डेमो
+                        </button>
+
+                        <button class="quickBtn" onclick="quickMsg('booking')">
+                            📅 बुकिंग
+                        </button>
+
+                        <button class="quickBtn" onclick="quickMsg('price')">
+                            💰 किंमत
+                        </button>
+
+                        <button class="quickBtn" onclick="quickMsg('location')">
+                            📍 लोकेशन
+                        </button>
+
+                    </span>
+                </div>
+            `;
+
+        }
+
+    }
+
+
+    /* =====================================================
+       ENTER KEY
+    ===================================================== */
+
+    input.addEventListener("keydown", function (event) {
+
+        if (event.key === "Enter") {
+
+            event.preventDefault();
+
+            sendMessage();
+
+        }
+
+    });
+
+
+    /* =====================================================
+       SEND BUTTON
+    ===================================================== */
+
+    sendBtn.addEventListener("click", function () {
+
+        sendMessage();
+
+    });
+
+
+    /* =====================================================
+       SEND MESSAGE
+    ===================================================== */
+
+    function sendMessage() {
+
+        const message = input.value.trim();
+
+        if (!message) {
+            return;
+        }
+
+
+        /* USER MESSAGE */
+
+        chat.innerHTML += `
+            <div class="userMsg">
+                <span>${escapeHtml(message)}</span>
+            </div>
+        `;
+
+
+        /* CLEAR INPUT IMMEDIATELY */
+
+        input.value = "";
+
+
+        /* TYPING */
+
+        const typing = document.createElement("div");
+
+        typing.className = "typing";
+
+        typing.innerText =
+            language === "hindi"
+                ? "उत्तर लिख रहा है..."
+                : "उत्तर देत आहे...";
+
+        chat.appendChild(typing);
+
+        chat.scrollTop = chat.scrollHeight;
+
+
+        /* =================================================
+           SEND REQUEST TO FLASK
+        ================================================= */
+
+        fetch("/chat", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                message: message,
+
+                language: language
+
+            })
+
+        })
+
+        .then(function (response) {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Server returned " + response.status
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(function (data) {
+
+            typing.remove();
+
+
+            const reply = data.reply || (
+                language === "hindi"
+                    ? "माफ़ कीजिए, अभी उत्तर उपलब्ध नहीं है।"
+                    : "माफ करा, सध्या उत्तर उपलब्ध नाही."
+            );
+
+
+            chat.innerHTML += `
+                <div class="botMsg">
+                    <span>${formatReply(reply)}</span>
+                </div>
+            `;
+
+
+            chat.scrollTop = chat.scrollHeight;
+
+        })
+
+        .catch(function (error) {
+
+            typing.remove();
+
+            console.error("CHAT ERROR:", error);
+
+
+            chat.innerHTML += `
+                <div class="botMsg">
+                    <span>
+                        ${
+                            language === "hindi"
+                            ? "⚠️ सर्वर से कनेक्शन नहीं हो पाया। कृपया थोड़ी देर बाद फिर कोशिश करें।"
+                            : "⚠️ सर्व्हरशी कनेक्शन होऊ शकले नाही. कृपया थोड्या वेळाने पुन्हा प्रयत्न करा."
+                        }
+                    </span>
+                </div>
+            `;
+
+            chat.scrollTop = chat.scrollHeight;
+
+        });
+
+    }
+
+
+    /* =====================================================
+       QUICK BUTTON
+    ===================================================== */
+
+    window.quickMsg = function (text) {
+
+        /*
+         * IMPORTANT:
+         * Do NOT put the quick-button text
+         * into the input box.
+         *
+         * Directly send it to Flask.
+         */
+
+        sendQuickMessage(text);
+
+    };
+
+
+    /* =====================================================
+       QUICK MESSAGE
+    ===================================================== */
+
+    function sendQuickMessage(message) {
+
+        /* Show user message */
+
+        chat.innerHTML += `
+            <div class="userMsg">
+                <span>${escapeHtml(message)}</span>
+            </div>
+        `;
+
+
+        /* Typing */
+
+        const typing = document.createElement("div");
+
+        typing.className = "typing";
+
+        typing.innerText =
+            language === "hindi"
+                ? "उत्तर लिख रहा है..."
+                : "उत्तर देत आहे...";
+
+        chat.appendChild(typing);
+
+        chat.scrollTop = chat.scrollHeight;
+
+
+        /* Send to Flask */
+
+        fetch("/chat", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                message: message,
+
+                language: language
+
+            })
+
+        })
+
+        .then(function (response) {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Server returned " + response.status
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(function (data) {
+
+            typing.remove();
+
+
+            const reply = data.reply || (
+                language === "hindi"
+                    ? "माफ़ कीजिए, अभी उत्तर उपलब्ध नहीं है।"
+                    : "माफ करा, सध्या उत्तर उपलब्ध नाही."
+            );
+
+
+            chat.innerHTML += `
+                <div class="botMsg">
+                    <span>${formatReply(reply)}</span>
+                </div>
+            `;
+
+
+            chat.scrollTop = chat.scrollHeight;
+
+        })
+
+        .catch(function (error) {
+
+            typing.remove();
+
+            console.error("QUICK CHAT ERROR:", error);
+
+
+            chat.innerHTML += `
+                <div class="botMsg">
+                    <span>
+                        ⚠️ ${
+                            language === "hindi"
+                            ? "सर्वर से कनेक्शन नहीं हो पाया।"
+                            : "सर्व्हरशी कनेक्शन होऊ शकले नाही."
+                        }
+                    </span>
+                </div>
+            `;
+
+        });
+
+    }
+
+
+    /* =====================================================
+       FORMAT FLASK RESPONSE
+    ===================================================== */
+
+    function formatReply(text) {
+
+        /*
+         * Flask is already returning HTML:
+         *
+         * <br>
+         * <a href="...">
+         *
+         * So DO NOT escape the response.
+         */
+
+        return text;
+
+    }
+
+
+    /* =====================================================
+       ESCAPE USER TEXT
+    ===================================================== */
+
+    function escapeHtml(text) {
+
+        const div = document.createElement("div");
+
+        div.textContent = text;
+
+        return div.innerHTML;
+
+    }
+
 });
 
-sendBtn.addEventListener("click", sendMessage);
-
-});
-
-
-
-function quickMsg(text){
-document.getElementById("userInput").value = text;
-sendMessage();
-}
-
-function sendMessage(){
-
-let input = document.getElementById("userInput");
-let message = input.value;
-
-if(message.trim()==="") return;
-
-let chat = document.getElementById("chatMessages");
-
-/* USER MESSAGE */
-chat.innerHTML += `
-<div class="userMsg">
-<span>${message}</span>
-</div>
-`;
-
-/* TYPING */
-let typing = document.createElement("div");
-
-typing.className = "typing";
-
-typing.innerText = "Typing...";
-
-chat.appendChild(typing);
-
-chat.scrollTop = chat.scrollHeight;
-
-/* FETCH */
-fetch("/chat",{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-message:message
-})
-})
-
-.then(async response => {
-
-if(!response.ok){
-throw new Error("Server Error");
-}
-
-return response.json();
-
-})
-
-.then(data => {
-
-typing.remove();
-
-chat.innerHTML += `
-<div class="botMsg">
-<span>${data.reply}</span>
-</div>
-`;
-
-chat.scrollTop = chat.scrollHeight;
-
-})
-
-.catch(error => {
-
-typing.remove();
-
-chat.innerHTML += `
-<div class="botMsg">
-<span>⚠ Server error. Please try again.</span>
-</div>
-`;
-
-console.log(error);
-
-});
-
-input.value="";
-}
 </script>

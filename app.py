@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 import time
 import re
 from datetime import datetime
+from admin_ai import register_admin_chatbot
+
 
 
 load_dotenv()
@@ -18,7 +20,46 @@ app.secret_key = os.environ["SECRET_KEY"]
 app.config['PREFERRED_URL_SCHEME'] = 'https'
 
 csrf = CSRFProtect(app)
+register_admin_chatbot(app, csrf)
 init()
+
+
+def get_demos(language, category=None):
+    conn = get_db_connection()
+    if conn is None:
+        return []
+
+    cursor = conn.cursor()
+    try:
+        query = """
+            SELECT id, title, video_url, is_new
+            FROM demos
+            WHERE language = %s
+        """
+        params = [language]
+        if category is not None:
+            query += " AND category = %s"
+            params.append(category)
+        query += " ORDER BY created_at DESC, id DESC"
+
+        cursor.execute(query, tuple(params))
+        demos = []
+        for demo_id, title, video_url, is_new in cursor.fetchall():
+            video_id = re.search(r"(?:v=|youtu\.be/)([^&?\s]+)", video_url)
+            if video_id:
+                demos.append({
+                    "id": demo_id,
+                    "title": title,
+                    "video_id": video_id.group(1),
+                    "is_new": bool(is_new)
+                })
+        return demos
+    except Exception as e:
+        print(f"Demo loading error: {e}")
+        return []
+    finally:
+        cursor.close()
+        conn.close()
 
 # Session security
 app.config['SESSION_COOKIE_HTTPONLY'] = True
@@ -106,6 +147,14 @@ def admin_login():
 
     return render_template("admin_login.html")
 
+@app.route("/bhakti-secure-admin-portal-84729/ai-assistant")
+def admin_ai_assistant():
+
+    if "admin" not in session:
+        return redirect("/bhakti-secure-admin-portal-84729/login")
+
+    return render_template("admin_ai_assistant.html")
+
 @app.route("/bhakti-secure-admin-portal-84729/dashboard")
 def admin_dashboard():
 
@@ -144,17 +193,35 @@ def admin_dashboard():
         bookings_raw = cursor.fetchall()
 
         bookings = []
+
         for b in bookings_raw:
+
             b = list(b)
-            if b[6]:  # created_at
-                if hasattr(b[6], 'strftime'):
-                    b[6] = b[6].strftime('%Y-%m-%d %H:%M')
+
+            # booking structure:
+            # 0 = id
+            # 1 = name
+            # 2 = phone
+            # 3 = service
+            # 4 = booking_date
+            # 5 = language
+            # 6 = status
+            # 7 = created_at
+
+            # Format booking date
+            if b[4]:
+                if hasattr(b[4], 'strftime'):
+                    b[4] = b[4].strftime('%Y-%m-%d')
                 else:
-                    # sqlite str
-                    try:
-                        b[6] = datetime.strptime(b[6], '%Y-%m-%d %H:%M:%S').strftime('%Y-%m-%d %H:%M')
-                    except ValueError:
-                        b[6] = str(b[6])
+                    b[4] = str(b[4])
+
+            # Format created date
+            if b[7]:
+                if hasattr(b[7], 'strftime'):
+                    b[7] = b[7].strftime('%Y-%m-%d %H:%M')
+                else:
+                    b[7] = str(b[7])
+
             bookings.append(b)
 
         conn.close()
@@ -265,72 +332,221 @@ def admin_social():
         return redirect("/bhakti-secure-admin-portal-84729/login")
     return render_template("socialMedia.html")
 
+@app.route("/hindi-demos")
+def hindi_demos():
+    return render_template("hindi_demos.html", database_demos=get_demos("hindi"))
+
+@app.route("/wel2")
+def wel2():
+    return render_template("wel2.html")
+
 @app.route("/booking", methods=["GET", "POST"])
 def booking():
 
     if request.method == "POST":
+
+        # =========================
+        # GET FORM DATA
+        # =========================
+
         name = request.form.get("name", "").strip()
+
         phone = request.form.get("phone", "").strip()
+
         service = request.form.get("service", "").strip()
+
         booking_date = request.form.get("booking_date", "").strip()
 
-        # Basic validation
-        if not all([name, phone, service, booking_date]):
+        language = request.form.get("language", "en").strip()
+
+        booking_time = request.form.get("booking_time", "").strip()
+
+
+        # =========================
+        # BASIC VALIDATION
+        # =========================
+
+        if not all([
+            name,
+            phone,
+            service,
+            booking_date,
+            language,
+            booking_time
+        ]):
+
             flash("All fields are required.", "error")
-            return redirect(url_for('booking'))
 
-        # Phone validation
-        if not re.match(r'^\d{10}$', phone):
-            flash("Phone must be exactly 10 digits.", "error")
-            return redirect(url_for('booking'))
+            return redirect(url_for("booking"))
 
-        # Date validation
+
+        # =========================
+        # LANGUAGE VALIDATION
+        # =========================
+
+        allowed_languages = ["en", "mr", "hi"]
+
+        if language not in allowed_languages:
+
+            language = "en"
+
+
+        # =========================
+        # PHONE VALIDATION
+        # =========================
+
+        if not re.match(r"^\d{10}$", phone):
+
+            flash(
+                "Phone must be exactly 10 digits.",
+                "error"
+            )
+
+            return redirect(url_for("booking"))
+
+
+        # =========================
+        # DATE VALIDATION
+        # =========================
+
         try:
-            booking_date_obj = datetime.strptime(booking_date, '%Y-%m-%d')
+
+            booking_date_obj = datetime.strptime(
+                booking_date,
+                "%Y-%m-%d"
+            )
+
             booking_date = booking_date_obj.date()
 
-            if booking_date_obj.date() < datetime.now().date():
-                flash("Booking date cannot be in the past.", "error")
-                return redirect(url_for('booking'))
+
+            if booking_date < datetime.now().date():
+
+                flash(
+                    "Booking date cannot be in the past.",
+                    "error"
+                )
+
+                return redirect(url_for("booking"))
+
 
         except ValueError:
-            flash("Invalid date format.", "error")
-            return redirect(url_for('booking'))
+
+            flash(
+                "Invalid date format.",
+                "error"
+            )
+
+            return redirect(url_for("booking"))
+
+
+        # =========================
+        # DATABASE CONNECTION
+        # =========================
 
         conn = get_db_connection()
 
+
         if conn is not None:
-            
+
             try:
+
                 cursor = conn.cursor(buffered=True)
+
+
+                # =========================
+                # SAVE BOOKING
+                # =========================
 
                 cursor.execute(
                     """
                     INSERT INTO bookings
-                    (name, phone, service, booking_date)
-                    VALUES (%s, %s, %s, %s)
+                    (
+                        name,
+                        phone,
+                        service,
+                        booking_date,
+                        language,
+                        status
+                    )
+                    VALUES
+                    (
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s,
+                        %s
+                    )
                     """,
-                    (name, phone, service, booking_date)
+                    (
+                        name,
+                        phone,
+                        service,
+                        booking_date,
+                        language,
+                        "Pending"
+                    )
                 )
 
+
                 conn.commit()
+
+
+                cursor.close()
+
                 conn.close()
 
-                # SUCCESS PAGE
-                return redirect(url_for('booking', success='true'))
+
+                # =========================
+                # SUCCESS
+                # =========================
+
+                return redirect(
+                    url_for(
+                        "booking",
+                        success="true"
+                    )
+                )
+
 
             except Exception as e:
-                print(f"Database error: {e}")
-                flash("Error saving booking", "error")
-                return redirect(url_for('booking'))
+
+                print(
+                    f"Database error: {e}"
+                )
+
+                if conn:
+                    conn.close()
+
+                flash(
+                    "Error saving booking.",
+                    "error"
+                )
+
+                return redirect(
+                    url_for("booking")
+                )
+
 
         else:
-            flash("Database not available", "error")
-            return redirect(url_for('booking'))
+
+            flash(
+                "Database not available.",
+                "error"
+            )
+
+            return redirect(
+                url_for("booking")
+            )
+
+
+    # =========================
+    # GET REQUEST
+    # =========================
 
     return render_template(
         "booking.html",
-        success=request.args.get('success')
+        success=request.args.get("success")
     )
 
 
@@ -386,28 +602,31 @@ def logo_page():
 
 @app.route('/election')
 def election_page():
-    return render_template('election.html')
+    return render_template(
+        'election.html',
+        database_demos=get_demos("marathi", "election") + get_demos("marathi", "general")
+    )
 
 
 @app.route('/campaign')
 def campaign_page():
-    return render_template('campaign.html')
+    return render_template('campaign.html', database_demos=get_demos("marathi", "campaign"))
 
 
 @app.route('/loudspeaker')
 def loudspeaker_page():
-    return render_template('loudspeaker.html')
+    return render_template('loudspeaker.html', database_demos=get_demos("marathi", "loudspeaker"))
 
 
 @app.route('/pro')
 def production_page():
-    return render_template('production.html')
+    return render_template('production.html', database_demos=get_demos("marathi", "production"))
 
 
 
 @app.route('/events')
 def events_page():
-    return render_template('events.html')
+    return render_template('events.html', database_demos=get_demos("marathi", "events"))
 
 
 
@@ -418,11 +637,11 @@ def about_page():
 
 @app.route('/dia')
 def dialogue_page():
-    return render_template('dialouge.html')
+    return render_template('dialouge.html', database_demos=get_demos("marathi", "dialogue"))
 
 @app.route('/social')
 def social_page():
-    return render_template('socialMedia.html')
+    return render_template('socialMedia.html', database_demos=get_demos("marathi", "social"))
 
 
 @csrf.exempt
@@ -449,6 +668,15 @@ def chat():
             "speaker","प्रचार","demo","playlist",
             "songs","गाणी","डेमो","music"
         ]
+
+        booking_words = [
+        "booking",
+        "book",
+        "बुकिंग",
+        "बुक",
+        "slot",
+        "appointment"
+    ]
 
         # PRICE
         if any(word in user_message for word in price_words):
@@ -489,15 +717,38 @@ def chat():
         elif any(word in user_message for word in location_words):
 
             reply = """
-            📍 आमचे स्टुडिओ लोकेशन 👇 <br><br>
+            📍 आमचे स्टुडिओ लोकेशन 👇<br><br>
 
-            🎙 Bhakti Recording Studio  
-            Junnar, Pune <br><br>
+            🎙 Bhakti Recording Studio<br>
+            Junnar, Pune<br><br>
 
             <a href="https://www.google.com/maps?q=19.1138352,74.1761465"
-            target="_blank">
-
+            target="_blank"
+            rel="noopener noreferrer">
             📍 View Location
+            </a>
+            """
+
+        elif any(word in user_message for word in booking_words):
+
+            reply = """
+            📅 बुकिंगसाठी खालील बटनावर क्लिक करा 👇<br><br>
+
+            🎙️ Bhakti Studio मध्ये तुमचा स्लॉट बुक करा.<br><br>
+
+            📞 थेट बुकिंगसाठी कॉल करा:<br>
+            👉 9146940518<br><br>
+
+            <a href="/booking"
+            style="
+            display:inline-block;
+            background:#c72c17;
+            color:white;
+            padding:10px 18px;
+            border-radius:8px;
+            text-decoration:none;
+            font-weight:600;">
+            📅 Book Your Slot
             </a>
             """
 
@@ -551,7 +802,8 @@ def chat():
         return jsonify({
             "reply": "⚠ Server error. Please try again."
         })
-        
+
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))

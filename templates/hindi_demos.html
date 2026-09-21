@@ -1,0 +1,288 @@
+{% extends "election.html" %}
+
+{% block title %}Hindi Demos | BHAKTI STUDIO{% endblock %}
+
+{% block content %}
+
+<!-- ================= NAVBAR ================= -->
+<link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='css/hindi_demos.css') }}"
+>
+
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+    <div class="container">
+
+        <!-- LOGO -->
+        <a class="navbar-brand d-flex align-items-center" href="/">
+            <img
+                src="{{ url_for('static', filename='images/LogoBhakti.png') }}"
+                alt="Logo"
+                class="brand-logo"
+            >
+            BHAKTI STUDIO
+        </a>
+
+        <!-- MOBILE BUTTON -->
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+        >
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- NAVIGATION -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/wel2">
+                        Home
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active-link" href="/hindi-demos">
+                        Hindi Demos
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/booking">
+                        Booking
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/social">
+                        About
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+    </div>
+</nav>
+
+
+<!-- ================= PAGE CONTENT ================= -->
+
+<div class="container py-5">
+
+    <!-- PAGE HEADING -->
+
+    <div class="text-center mb-5">
+
+        <h2 class="page-title">
+            🎵 Hindi Music Demos
+        </h2>
+
+        <p class="text-white-50">
+            Explore our Hindi music demos created at Bhakti Studio.
+        </p>
+
+    </div>
+
+
+    <!-- ================= VIDEO CARDS ================= -->
+
+    <div class="row g-4">
+
+        {% set hindi_videos = [
+
+            ('1fug0kSvCko', 'Hindi Demo 01 | Bhakti Studio'),
+
+            ('m4_Qk8iMRAc', 'Hindi Demo 02 | Bhakti Studio'),
+
+            ('zKS1FCMI5Ao', 'Hindi Demo 03 | Bhakti Studio'),
+
+            ('qDWEAZ7YcK0', 'Hindi Demo 04 | Bhakti Studio'),
+
+            ('pcdCa8BRgfQ', 'Hindi Demo 05 | Bhakti Studio'),
+
+            ('3_xapjcl2bU', 'Hindi Short Demo 06 | Bhakti Studio'),
+
+            ('KYp0s0IeO14', 'Hindi Short Demo 07 | Bhakti Studio'),
+
+            ('y5UCukaFxEI', 'Hindi Short Demo 08 | Bhakti Studio')
+
+        ] %}
+
+
+        {% for id, title in hindi_videos %}
+
+        <div class="col-lg-4 col-md-6 col-12">
+
+            <div class="card video-card shadow-sm">
+
+                <div
+                    class="video-container"
+                    onclick="playVideo(this, '{{ id }}')"
+                >
+
+                    <img
+                        src="https://img.youtube.com/vi/{{ id }}/hqdefault.jpg"
+                        class="video-thumbnail"
+                        alt="{{ title }}"
+                    >
+
+                    <div class="play-btn">
+                        ▶
+                    </div>
+
+                </div>
+
+
+                <div class="card-body text-center">
+
+                    <p class="fw-semibold mb-0">
+                        {{ title }}
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+        {% for demo in database_demos|default([]) %}
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card video-card shadow-sm">
+                <div class="video-container" onclick="playVideo(this, '{{ demo.video_id }}')">
+                    <img src="https://img.youtube.com/vi/{{ demo.video_id }}/hqdefault.jpg" class="video-thumbnail" alt="{{ demo.title }}">
+                    <div class="play-btn">▶</div>
+                </div>
+                <div class="card-body text-center">
+                    <p class="fw-semibold mb-0">{{ demo.title }}{% if demo.is_new %} <span class="badge bg-warning text-dark">NEW</span>{% endif %}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+<!-- ================= HINDI BOOKING BUTTON ================= -->
+<!-- ================= HINDI BOOKING CTA ================= -->
+
+<div class="hindi-booking-section">
+
+    <div class="hindi-booking-content">
+
+        <div class="booking-icon">
+            🎙️
+        </div>
+
+        <div class="booking-text">
+            <h3>Want Your Own Hindi Song?</h3>
+            <p>
+                Book a studio slot and create your professional Hindi song with Bhakti Studio.
+            </p>
+        </div>
+
+        <a href="/booking?language=hindi" class="hindi-booking-btn">
+            <span>Book Hindi Studio Slot</span>
+            <span class="booking-arrow">→</span>
+        </a>
+
+    </div>
+
+</div>
+
+<!-- ================= VIDEO SCRIPT ================= -->
+
+<script>
+
+let currentActivePlayer = null;
+
+
+function playVideo(container, videoId) {
+
+    /*
+       If another video is already playing,
+       restore its thumbnail.
+    */
+
+    if (
+        currentActivePlayer &&
+        currentActivePlayer !== container
+    ) {
+
+        const oldId =
+            currentActivePlayer.getAttribute(
+                'data-active-id'
+            );
+
+        currentActivePlayer.innerHTML = `
+
+            <img
+                src="https://img.youtube.com/vi/${oldId}/hqdefault.jpg"
+                class="video-thumbnail"
+                alt="Video thumbnail"
+            >
+
+            <div class="play-btn">
+                ▶
+            </div>
+
+        `;
+    }
+
+
+    /*
+       Store the currently playing video.
+    */
+
+    currentActivePlayer = container;
+
+    container.setAttribute(
+        'data-active-id',
+        videoId
+    );
+
+
+    /*
+       Replace thumbnail with YouTube player.
+    */
+
+    container.innerHTML = `
+
+        <iframe
+
+            src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0"
+
+            frameborder="0"
+
+            allow="
+                accelerometer;
+                autoplay;
+                clipboard-write;
+                encrypted-media;
+                gyroscope;
+                picture-in-picture;
+                web-share
+            "
+
+            allowfullscreen
+
+            style="
+                width:100%;
+                height:100%;
+            "
+
+        ></iframe>
+
+    `;
+}
+
+</script>
+
+{% endblock %}

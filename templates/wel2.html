@@ -1,143 +1,373 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Bhakti Studio</title>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.ico.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/wel2.css') }}">
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+    >
+
+    <!-- Favicon -->
+    <link
+        rel="icon"
+        type="image/png"
+        href="{{ url_for('static', filename='images/favicon.ico.png') }}"
+    >
+
+    <!-- Existing CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='css/wel2.css') }}"
+    >
 
     <style>
-          .hero {
-            background: url("{{ url_for('static', filename='images/welimg.jpg') }}") no-repeat center center/cover;
-            height: 100vh;
+
+        /* ================= HERO ================= */
+
+        .hero {
+            background: url("{{ url_for('static', filename='images/welimg.jpg') }}")
+                no-repeat center center/cover;
+
+            min-height: 100vh;
             position: relative;
             color: white;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+
+            background: rgba(0, 0, 0, 0.45);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+
+            text-align: center;
+            width: 100%;
+            max-width: 900px;
+
+            padding: 30px 20px;
+
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* ================= HEADING ================= */
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+
+            margin-bottom: 15px;
+
+            text-shadow:
+                0 4px 15px rgba(0, 0, 0, 0.8);
+
+            letter-spacing: 1px;
+        }
+
+        .hero-content p {
+            font-size: 1.3rem;
+            font-weight: 500;
+
+            margin-bottom: 35px;
+
+            text-shadow:
+                0 3px 10px rgba(0, 0, 0, 0.8);
+        }
+
+        /* ================= BUTTON AREA ================= */
+
+        .home-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            gap: 25px;
+        }
+
+        /* ================= BOOKING BUTTON ================= */
+
+        .main-book-btn {
+            display: inline-flex;
+
+            justify-content: center;
+            align-items: center;
+
+            min-width: 270px;
+
+            padding: 16px 35px;
+
+            border-radius: 50px;
+
+            background: linear-gradient(
+                135deg,
+                #c72c17,
+                #ff5733
+            );
+
+            color: white !important;
+
+            border: none;
+
+            font-size: 20px;
+            font-weight: 700;
+
+            text-decoration: none;
+
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.5);
+
+            transition: all 0.3s ease;
+        }
+
+        .main-book-btn:hover {
+            transform: translateY(-5px) scale(1.04);
+
+            box-shadow:
+                0 12px 35px rgba(0, 0, 0, 0.7);
+        }
+
+        /* ================= DEMO BUTTONS ================= */
+
+        .demo-title {
+            color: white;
+
+            font-size: 1.2rem;
+            font-weight: 600;
+
+            margin-bottom: 5px;
+
+            text-shadow:
+                0 2px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        .demo-language-buttons {
+            display: flex;
+
+            justify-content: center;
+
+            gap: 20px;
+
+            flex-wrap: wrap;
+        }
+
+        .language-demo-btn {
+            display: inline-flex;
+
+            justify-content: center;
+            align-items: center;
+
+            min-width: 230px;
+
+            padding: 14px 30px;
+
+            border-radius: 50px;
+
+            color: white !important;
+
+            text-decoration: none;
+
+            font-size: 18px;
+            font-weight: 700;
+
+            border: 2px solid rgba(255, 255, 255, 0.7);
+
+            background: rgba(0, 0, 0, 0.25);
+
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
+            box-shadow:
+                0 6px 20px rgba(0, 0, 0, 0.4);
+
+            transition: all 0.3s ease;
+        }
+
+        .language-demo-btn:hover {
+            transform: translateY(-5px);
+
+            background: rgba(255, 255, 255, 0.2);
+
+            box-shadow:
+                0 10px 30px rgba(0, 0, 0, 0.6);
+        }
+
+        /* Hindi */
+
+        .hindi-btn:hover {
+            border-color: #ff9933;
+
+            text-shadow:
+                0 0 10px rgba(255, 153, 51, 0.8);
+        }
+
+        /* Marathi */
+
+        .marathi-btn:hover {
+            border-color: #ffd700;
+
+            text-shadow:
+                0 0 10px rgba(255, 215, 0, 0.8);
+        }
+
+        /* ================= ANIMATION ================= */
+
+        @keyframes fadeIn {
+
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 768px) {
+
+            .hero-content h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content p {
+                font-size: 1.1rem;
+            }
+
+            .demo-language-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .language-demo-btn {
+                width: 90%;
+                max-width: 300px;
+            }
+
+            .main-book-btn {
+                width: 90%;
+                max-width: 300px;
+            }
+
+        }
+
+        @media (max-width: 480px) {
+
+            .hero-content h1 {
+                font-size: 2rem;
+            }
+
+            .hero-content p {
+                font-size: 1rem;
+            }
+
+        }
+
     </style>
 
 </head>
 
+
 <body>
 
-<!-- HERO SECTION -->
+
+<!-- ================= HERO SECTION ================= -->
+
 <section class="hero">
+
     <div class="overlay"></div>
+
     <div class="hero-content">
-        <h1 class="display-4" >🙏 Welcome to Bhakti Studio</h1>
-        <p class="lead"  style="font-family: emoji;">Political Songs • Music Production • Wedding Songs</p>
-     
-    <div class="d-flex justify-content-center gap-3 mt-3">
-    <a href="#demos" class="btn btn-warning btn-lg blinking-btn">
-        Explore Demos
+
+        <h1>
+            Welcome to Bhakti Studio
+        </h1>
+
+        <p>
+            Political Songs • Music Production • Wedding Songs
+        </p>
+
+
+        <div class="home-buttons">
+
+    <!-- BOOKING -->
+    <a href="/booking" class="main-book-btn">
+        Book Your Studio Slot
     </a>
 
-    <a href="/booking" class="btn btn-dark btn-lg ">
-        Book Your Slot 
-    </a>
-        </div>
-    </div>
-</section>
+    <!-- DEMO SECTION -->
+    <div class="demo-section">
 
-<!-- DEMO CARDS SECTION -->
-<section id="demos" class="cards-section">
-    <div class="container">
-   <h2 class="text-center mb-5 demo-heading">🎧 Demo Categories</h2>
+        <h3 class="demo-title">
+            Explore Our Demos
+        </h3>
 
-        <div class="row g-4 justify-content-center">
+        <p class="demo-subtitle">
+            Listen to our latest Hindi and Marathi music productions
+        </p>
 
-            <!-- Election -->
-            <div class="col-md-4">
-                <a href="/election" class="card-link">
-                    <div class="card demo-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Election Campaign Songs</h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
+        <div class="demo-language-buttons">
 
-            <!-- Name & Symbol -->
-            <div class="col-md-4">
-                <a href="/campaign" class="card-link">
-                    <div class="card demo-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Name & Symbol Campaign Songs</h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
+            <!-- HINDI -->
+            <a href="/hindi-demos" class="language-demo-btn hindi-btn">
+                <span class="btn-title">हिंदी Demos</span>
+                <span class="btn-arrow">→</span>
+            </a>
 
-            <!-- Professional Music -->
-            <div class="col-md-4">
-                <a href="/pro" class="card-link">
-                    <div class="card demo-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Professional Music Production</h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Wedding -->
-            <div class="col-md-4">
-                <a href="/events" class="card-link">
-                    <div class="card demo-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Wedding & Special Occasion Songs</h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Loudspeaker -->
-            <div class="col-md-4">
-                <a href="/loudspeaker" class="card-link">
-                    <div class="card demo-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Loudspeaker Campaign Audio</h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Dialogue -->
-            <div class="col-md-4">
-                <a href="/dia" class="card-link">
-                    <div class="card demo-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">Campaign Dialogue</h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
-
-            <!-- Social Media -->
-            <div class="col-md-4">
-                <a href="/social" class="card-link">
-                    <div class="card demo-card">
-                        <div class="card-body text-center">
-                            <h5 class="card-title">
-                                Social Media <br>
-                                <i class="fa-brands fa-square-instagram"></i>
-                                <i class="fa-brands fa-youtube"></i>
-                            </h5>
-                        </div>
-                    </div>
-                </a>
-            </div>
+            <!-- MARATHI -->
+            <a href="/election" class="language-demo-btn marathi-btn">
+                <span class="btn-title">मराठी Demos</span>
+                <span class="btn-arrow">→</span>
+            </a>
 
         </div>
+
     </div>
+
+</div>
+
+        </div>
+
+    </div>
+
 </section>
 
-<!-- FOOTER -->
+
+
+<!-- ================= FOOTER ================= -->
+
 <footer>
-    <p>© 2026 Bhakti Studio | All Rights Reserved</p>
-    <p>📞 Contact: 9146940518</p>
+
+    <p>
+        © 2026 Bhakti Studio | All Rights Reserved
+    </p>
+
+    <p>
+        📞 Contact: 9146940518
+    </p>
+
 </footer>
 
+
 </body>
+
 </html>

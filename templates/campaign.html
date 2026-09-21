@@ -16,6 +16,7 @@
          
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/wel2">Home</a></li>
                 <li class="nav-item"><a class="nav-link" href="/election">Election</a></li>
                 <li class="nav-item"><a class="nav-link active-link" href="/campaign">Campaign</a></li>
                 <li class="nav-item"><a class="nav-link" href="/loudspeaker">Loudspeaker</a></li>
@@ -56,6 +57,18 @@
                 <div class="card-body text-center">
                     <p class="fw-semibold mb-0" style="color: #fff; font-size: 0.95rem;">{{ title }}</p>
                 </div>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% for demo in database_demos|default([]) %}
+        <div class="col-lg-4 col-md-6 col-12">
+            <div class="card video-card shadow-sm">
+                <div class="video-container" onclick="playVideo(this, '{{ demo.video_id }}')">
+                    <img src="https://img.youtube.com/vi/{{ demo.video_id }}/hqdefault.jpg" style="width: 100%; height: 100%; object-fit: cover; border-bottom: 3px solid #ffc107;" alt="{{ demo.title }}">
+                    <div class="play-btn">▶</div>
+                </div>
+                <div class="card-body text-center"><p class="fw-semibold mb-0" style="color: #fff;">{{ demo.title }}{% if demo.is_new %} <span class="badge bg-warning text-dark">NEW</span>{% endif %}</p></div>
             </div>
         </div>
         {% endfor %}

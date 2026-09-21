@@ -50,7 +50,13 @@
                 <i class="fas fa-share-alt"></i>
                 <span>Social Media</span>
             </a>
-        </nav>
+            <a href="/bhakti-secure-admin-portal-84729/ai-assistant" class="nav-link ai-assistant-link">
+                <i class="fas fa-wand-magic-sparkles"></i>
+                <span>AI Assistant</span>
+            </a>
+
+        
+                </nav>
 
         <div class="sidebar-footer">
             <a href="/bhakti-secure-admin-portal-84729/logout" class="logout-btn">
@@ -146,76 +152,131 @@
 
             <div class="table-wrapper">
                 <table id="bookingsTable">
-                    <thead>
+                   <thead>
                         <tr>
                             <th>ID</th>
                             <th>Name</th>
                             <th>Phone</th>
                             <th>Service</th>
                             <th>Booking Date</th>
+                            <th>Language</th>
                             <th>Status</th>
                             <th>Created</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                   <tbody>
-{% for booking in bookings %}
-<tr data-status="{{ booking[5] }}">
-    <td>{{ booking[0] }}</td>
-    <td>{{ booking[1] }}</td>
+                  <tbody>
 
+{% for booking in bookings %}
+
+<tr data-status="{{ booking[6] }}">
+
+    <!-- ID -->
     <td>
-        <a href="#" 
-           onclick="openWhatsApp('{{ booking[2] }}', '{{ booking[1] }}')" 
+        {{ booking[0] }}
+    </td>
+
+    <!-- NAME -->
+    <td>
+        {{ booking[1] }}
+    </td>
+
+    <!-- PHONE -->
+    <td>
+        <a href="#"
+           onclick="openWhatsApp('{{ booking[2] }}', '{{ booking[1] }}')"
            class="phone-link">
             {{ booking[2] }}
         </a>
     </td>
 
-    <td>{{ booking[3] }}</td>
-    <td>{{ booking[4] if booking[4] else 'N/A' }}</td>
-
+    <!-- SERVICE -->
     <td>
-        <span class="status-badge status-{{ booking[5].lower() }}">
-            {{ booking[5] }}
+        {{ booking[3] }}
+    </td>
+
+    <!-- BOOKING DATE -->
+    <td>
+        {{ booking[4] if booking[4] else 'N/A' }}
+    </td>
+
+    <!-- LANGUAGE -->
+    <td>
+        {{ booking[5] if booking[5] else 'N/A' }}
+    </td>
+
+    <!-- STATUS -->
+    <td>
+        <span class="status-badge status-{{ booking[6].lower() }}">
+            {{ booking[6] }}
         </span>
     </td>
 
+    <!-- CREATED -->
     <td>
-        {{ booking[6] if booking[6] else 'N/A' }}
+        {{ booking[7] if booking[7] else 'N/A' }}
     </td>
 
+    <!-- ACTIONS -->
     <td class="actions">
 
-        {% if booking[5] == 'Pending' %}
+        {% if booking[6] == 'Pending' %}
 
-            <button onclick="updateStatus({{ booking[0] }}, 'Confirmed', '{{ booking[2] }}', '{{ booking[1] }}')" class="action-btn confirm">
+            <button
+                onclick="updateStatus(
+                    {{ booking[0] }},
+                    'Confirmed',
+                    '{{ booking[2] }}',
+                    '{{ booking[1] }}'
+                )"
+                class="action-btn confirm">
+                <i class="fas fa-check"></i>
                 Confirm
             </button>
 
-          <button onclick="updateStatus({{ booking[0] }}, 'Rejected', '{{ booking[2] }}', '{{ booking[1] }}')"
+            <button
+                onclick="updateStatus(
+                    {{ booking[0] }},
+                    'Rejected',
+                    '',
+                    ''
+                )"
                 class="action-btn reject">
-            Reject
-        </button>
+                <i class="fas fa-times"></i>
+                Reject
+            </button>
 
-        {% elif booking[5] == 'Confirmed' %}
+        {% elif booking[6] == 'Confirmed' %}
 
-            <button onclick="updateStatus({{ booking[0] }}, 'Completed')" class="action-btn complete">
+            <button
+                onclick="updateStatus(
+                    {{ booking[0] }},
+                    'Completed',
+                    '',
+                    ''
+                )"
+                class="action-btn complete">
+                <i class="fas fa-check-double"></i>
                 Complete
             </button>
 
-        {% elif booking[5] == 'Completed' or booking[5] == 'Rejected' %}
+        {% elif booking[6] == 'Completed' or booking[6] == 'Rejected' %}
 
-        <button onclick="deleteBooking({{ booking[0] }})"
+            <button
+                onclick="deleteBooking({{ booking[0] }})"
                 class="action-btn delete">
-            Delete
-        </button>
+                <i class="fas fa-trash"></i>
+                Delete
+            </button>
 
         {% endif %}
 
     </td>
+
 </tr>
+
 {% endfor %}
+
 </tbody>
                 </table>
             </div>
@@ -432,7 +493,11 @@
 
             toast.style.display = 'block';
             setTimeout(() => {
-                toast.style.display = 'none';
+                toast.classList.add('toast-hiding');
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                    toast.classList.remove('toast-hiding');
+                }, 220);
             }, 3000);
         }
 

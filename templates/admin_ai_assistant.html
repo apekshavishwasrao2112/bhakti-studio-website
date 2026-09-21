@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Assistant | Bhakti Studio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --black: #000;
+            --panel: #111;
+            --card: #151515;
+            --line: #2a2a2a;
+            --muted: #9ca3af;
+            --white: #fff;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--black);
+            color: var(--white);
+            font-family: "Segoe UI", "Noto Sans Devanagari", Arial, sans-serif;
+        }
+
+        .assistant-page {
+            width: min(1040px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 28px 0 34px;
+        }
+
+        .assistant-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding-bottom: 22px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            border-radius: 50%;
+        }
+
+        .brand h1 {
+            margin: 0;
+            font-size: 25px;
+            font-weight: 700;
+        }
+
+        .brand p {
+            margin: 4px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .dashboard-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--white);
+            background: #000;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 9px 13px;
+            text-decoration: none;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dashboard-link:hover,
+        .quick-card:hover,
+        .send-button:hover,
+        .form-button:hover {
+            background: #242424;
+        }
+
+        .dashboard-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28);
+        }
+
+        .dashboard-link:active { transform: translateY(0); }
+
+        .chat-panel {
+            margin-top: 24px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chat-area {
+            min-height: 245px;
+            max-height: 430px;
+            overflow-y: auto;
+            padding: 22px;
+        }
+
+        .message { display: flex; margin-bottom: 16px; }
+        .message.user { justify-content: flex-end; }
+        .bubble {
+            max-width: 86%;
+            padding: 13px 16px;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            line-height: 1.6;
+            word-break: break-word;
+        }
+        .message.bot .bubble { background: var(--card); }
+        .message.user .bubble { background: #222; }
+
+        .quick-section {
+            padding: 0 22px 22px;
+        }
+
+        .quick-section h2 {
+            margin: 0 0 12px;
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .quick-card {
+            min-height: 78px;
+            padding: 12px;
+            text-align: left;
+            color: var(--white);
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            cursor: pointer;
+            transition: background .2s ease, border-color .2s ease;
+        }
+
+        .quick-card strong,
+        .quick-card span { display: block; }
+        .quick-card strong { margin-bottom: 6px; font-size: 14px; }
+        .quick-card span { color: var(--muted); font-size: 12px; }
+
+        .form-panel {
+            display: none;
+            margin: 0 22px 22px;
+            padding: 16px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 9px;
+        }
+
+        .form-panel.visible { display: block; }
+        .form-panel h3 { margin: 0 0 14px; font-size: 16px; }
+        .field { display: grid; gap: 6px; margin-bottom: 12px; }
+        .field label { color: var(--muted); font-size: 12px; }
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 11px 12px;
+            color: var(--white);
+            background: #0b0b0b;
+            border: 1px solid #383838;
+            border-radius: 7px;
+            outline: none;
+        }
+        .field input:focus,
+        .field select:focus { border-color: #777; }
+
+        .form-button,
+        .send-button {
+            padding: 10px 14px;
+            color: var(--white);
+            background: #1c1c1c;
+            border: 1px solid #3a3a3a;
+            border-radius: 7px;
+            cursor: pointer;
+            font-weight: 700;
+        }
+
+        .delete-note { color: var(--muted); font-size: 12px; margin: 0 0 12px; }
+        .delete-confirmation button,
+        .success-message + .view-demo-btn {
+            display: inline-block;
+            margin: 8px 8px 0 0;
+            padding: 9px 13px;
+            color: var(--white);
+            background: #1c1c1c;
+            border: 1px solid #444;
+            border-radius: 7px;
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 700;
+        }
+        .delete-confirmation .delete-demo-btn { background: #351515; border-color: #713333; }
+        .delete-confirmation .cancel-delete-btn { background: #222; }
+        .success-message { display: flex; align-items: flex-start; gap: 12px; }
+        .success-icon { font-size: 25px; }
+        .success-text { display: grid; gap: 4px; }
+        .success-text span { color: var(--muted); }
+
+        .input-bar {
+            display: flex;
+            gap: 10px;
+            padding: 14px;
+            border-top: 1px solid var(--line);
+            background: #0d0d0d;
+        }
+
+        .input-bar input {
+            flex: 1;
+            min-width: 0;
+            padding: 12px 13px;
+            color: var(--white);
+            background: #000;
+            border: 1px solid #383838;
+            border-radius: 8px;
+            outline: none;
+        }
+        .input-bar input:focus { border-color: #777; }
+
+        @media (max-width: 800px) {
+            .quick-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 520px) {
+            .assistant-page { width: min(100% - 20px, 1040px); padding-top: 18px; }
+            .assistant-header { align-items: flex-start; }
+            .brand h1 { font-size: 21px; }
+            .brand-logo { width: 42px; height: 42px; }
+            .dashboard-link { font-size: 13px; }
+            .quick-grid { grid-template-columns: 1fr; }
+            .input-bar { flex-direction: column; }
+            .send-button { min-height: 42px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="assistant-page">
+        <header class="assistant-header">
+            <div class="brand">
+                <img class="brand-logo" src="{{ url_for('static', filename='images/LogoBhakti.png') }}" alt="Bhakti Studio logo">
+                <div>
+                    <h1>AI Assistant</h1>
+                    <p>Bhakti Studio Admin Assistant</p>
+                </div>
+            </div>
+            <a class="dashboard-link" href="/bhakti-secure-admin-portal-84729/dashboard">
+                <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                Admin Dashboard
+            </a>
+        </header>
+
+        <section class="chat-panel">
+            <div class="chat-area" id="adminChatMessages">
+                <div class="message bot">
+                    <div class="bubble">
+                        Namaskar! 👋<br><br>
+                        मी तुमचा Bhakti Studio Admin Assistant आहे.<br><br>
+                        तुम्ही खालील कामे थेट करू शकता:
+                    </div>
+                </div>
+            </div>
+
+            <section class="quick-section" aria-label="Quick actions">
+                <h2>Quick actions</h2>
+                <div class="quick-grid">
+                    <button class="quick-card" type="button" data-form="marathiForm">
+                        <strong>＋ Marathi Demo</strong>
+                        <span>Add a new Marathi demo</span>
+                    </button>
+                    <button class="quick-card" type="button" data-form="hindiForm">
+                        <strong>＋ Hindi Demo</strong>
+                        <span>Add a new Hindi demo</span>
+                    </button>
+                    <button class="quick-card" type="button" data-command="bookings दाखव">
+                        <strong>📋 Bookings</strong>
+                        <span>View total bookings</span>
+                    </button>
+                    <button class="quick-card" type="button" data-command="pending bookings दाखव">
+                        <strong>⏳ Pending Bookings</strong>
+                        <span>View pending bookings</span>
+                    </button>
+                    <button class="quick-card" type="button" data-form="deleteForm">
+                        <strong>🗑 Delete Demo</strong>
+                        <span>Delete a recently added demo</span>
+                    </button>
+                </div>
+            </section>
+
+            <form class="form-panel" id="marathiForm">
+                <h3>Marathi Demo</h3>
+                <div class="field">
+                    <label for="marathiUrl">YouTube Video Link</label>
+                    <input id="marathiUrl" type="url" placeholder="Paste YouTube link here..." required>
+                </div>
+                <div class="field">
+                    <label for="marathiCategory">Category</label>
+                    <select id="marathiCategory">
+                        <option value="election">Election</option>
+                        <option value="campaign">Campaign</option>
+                        <option value="loudspeaker">Loudspeaker</option>
+                        <option value="production">Production</option>
+                        <option value="events">Events</option>
+                        <option value="social">Social Media</option>
+                        <option value="dialogue">Dialogue</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                <button class="form-button" type="submit">Add Marathi Demo</button>
+            </form>
+
+            <form class="form-panel" id="hindiForm">
+                <h3>Hindi Demo</h3>
+                <div class="field">
+                    <label for="hindiUrl">YouTube Video Link</label>
+                    <input id="hindiUrl" type="url" placeholder="Paste YouTube link here..." required>
+                </div>
+                <div class="field">
+                    <label for="hindiCategory">Category</label>
+                    <select id="hindiCategory">
+                        <option value="election">Election</option>
+                        <option value="campaign">Campaign</option>
+                        <option value="loudspeaker">Loudspeaker</option>
+                        <option value="production">Production</option>
+                        <option value="events">Events</option>
+                        <option value="social">Social Media</option>
+                        <option value="dialogue">Dialogue</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                <button class="form-button" type="submit">Add Hindi Demo</button>
+            </form>
+
+            <form class="form-panel" id="deleteForm">
+                <h3>Delete Demo</h3>
+                <p class="delete-note">The latest matching demo will be shown for confirmation before deletion.</p>
+                <div class="field">
+                    <label for="deleteLanguage">Language</label>
+                    <select id="deleteLanguage">
+                        <option value="Marathi">Marathi</option>
+                        <option value="Hindi">Hindi</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="deleteCategory">Category</label>
+                    <select id="deleteCategory">
+                        <option value="election">Election</option>
+                        <option value="campaign">Campaign</option>
+                        <option value="loudspeaker">Loudspeaker</option>
+                        <option value="production">Production</option>
+                        <option value="events">Events</option>
+                        <option value="social">Social Media</option>
+                        <option value="dialogue">Dialogue</option>
+                        <option value="general">General</option>
+                    </select>
+                </div>
+                <button class="form-button" type="submit">Find Latest Demo</button>
+            </form>
+
+            <div class="input-bar">
+                <input id="adminUserInput" type="text" placeholder="Type a command..." autocomplete="off">
+                <button class="send-button" id="adminSendBtn" type="button">➤</button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const messages = document.getElementById("adminChatMessages");
+        const input = document.getElementById("adminUserInput");
+
+        function escapeHtml(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function appendUserMessage(text) {
+            messages.insertAdjacentHTML("beforeend", `<div class="message user"><div class="bubble">${escapeHtml(text)}</div></div>`);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function appendBotReply(reply) {
+            messages.insertAdjacentHTML("beforeend", `<div class="message bot"><div class="bubble">${reply}</div></div>`);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        async function sendToBackend(payload, displayText = "") {
+            if (displayText) appendUserMessage(displayText);
+            try {
+                const response = await fetch("/admin-ai-chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.reply || "Server error");
+                appendBotReply(data.reply || "");
+            } catch (error) {
+                appendBotReply(`⚠️ ${escapeHtml(error.message)}`);
+            }
+        }
+
+        function showForm(formId) {
+            document.querySelectorAll(".form-panel").forEach(form => form.classList.remove("visible"));
+            document.getElementById(formId).classList.add("visible");
+        }
+
+        document.querySelectorAll(".quick-card").forEach(button => {
+            button.addEventListener("click", () => {
+                if (button.dataset.form) {
+                    showForm(button.dataset.form);
+                } else if (button.dataset.command) {
+                    sendToBackend({ message: button.dataset.command }, button.dataset.command);
+                }
+            });
+        });
+
+        document.getElementById("marathiForm").addEventListener("submit", event => {
+            event.preventDefault();
+            const url = document.getElementById("marathiUrl").value.trim();
+            const category = document.getElementById("marathiCategory").value;
+            sendToBackend({ language: "marathi", category, video_url: url }, `Marathi ${category} demo: ${url}`);
+            event.target.reset();
+        });
+
+        document.getElementById("hindiForm").addEventListener("submit", event => {
+            event.preventDefault();
+            const url = document.getElementById("hindiUrl").value.trim();
+            const category = document.getElementById("hindiCategory").value;
+            sendToBackend({ language: "hindi", category, video_url: url }, `Hindi ${category} demo: ${url}`);
+            event.target.reset();
+        });
+
+        document.getElementById("deleteForm").addEventListener("submit", event => {
+            event.preventDefault();
+            const language = document.getElementById("deleteLanguage").value;
+            const category = document.getElementById("deleteCategory").value;
+            sendToBackend({ message: `Delete the latest ${language} ${category} demo` }, `Find latest ${language} ${category} demo`);
+        });
+
+        document.getElementById("adminSendBtn").addEventListener("click", () => {
+            const message = input.value.trim();
+            if (!message) return;
+            input.value = "";
+            sendToBackend({ message }, message);
+        });
+
+        input.addEventListener("keydown", event => {
+            if (event.key === "Enter") document.getElementById("adminSendBtn").click();
+        });
+
+        messages.addEventListener("click", event => {
+            const button = event.target.closest("[data-action]");
+            if (!button) return;
+            sendToBackend({ action: button.dataset.action, id: button.dataset.id });
+        });
+    </script>
+</body>
+</html>

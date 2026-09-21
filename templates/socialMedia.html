@@ -6,6 +6,7 @@
     <title>Social Hub | Bhakti Studio & Avishkar Vishwasrao</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
@@ -63,6 +64,42 @@
         }
 
         .nav-overlay a:hover { color: var(--accent); }
+
+        .admin-dashboard-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: fixed;
+            top: 68px;
+            left: 20px;
+            z-index: 1001;
+            padding: 9px 14px;
+            border-radius: 8px;
+            background: #000;
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.86rem;
+            font-weight: 600;
+            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .admin-dashboard-link:hover {
+            background: #1c1c1c;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28);
+        }
+
+        .admin-dashboard-link:active { transform: translateY(0); }
+
+        @media (max-width: 576px) {
+            .admin-dashboard-link {
+                top: 62px;
+                left: 12px;
+                right: 12px;
+                justify-content: center;
+            }
+        }
 
         /* Premium Glass Container */
         .glass-panel {
@@ -133,11 +170,16 @@
 <body>
 
     <nav class="nav-overlay">
-        <a href="/election">HOME</a>
+        <a href="/wel2">HOME</a>
         <a href="#youtube">YOUTUBE</a>
         <a href="#instagram">INSTAGRAM</a>
         <a href="#contact" style="color: var(--accent);">HIRE US</a>
     </nav>
+
+    <a class="admin-dashboard-link" href="/bhakti-secure-admin-portal-84729/dashboard">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+        Admin Dashboard
+    </a>
 
   <section id="youtube" class="parallax-section bg-studio-1">
     <div class="container">
@@ -252,6 +294,24 @@
             </div>
         </div>
     </section>
+
+    {% if database_demos|default([]) %}
+    <section class="parallax-section bg-studio-2">
+        <div class="container">
+            <h2 class="text-center text-warning mb-4">New Marathi Demos</h2>
+            <div class="row g-4">
+                {% for demo in database_demos %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card bg-dark text-white h-100">
+                        <iframe src="https://www.youtube.com/embed/{{ demo.video_id }}" title="{{ demo.title }}" allowfullscreen></iframe>
+                        <div class="card-body text-center">{{ demo.title }}{% if demo.is_new %} <span class="badge bg-warning text-dark">NEW</span>{% endif %}</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
 
     <section id="contact" class="parallax-section bg-studio-3">
         <div class="container text-center">

@@ -26,17 +26,17 @@ def get_db_connection():
         print(f"[ERROR] MySQL connection failed: {e}")
         return None
 
-
 def init():
 
     conn = get_db_connection()
 
     if conn is None:
-        return jsonify({"success": False, "message": "Database error"})
+        print("[ERROR] Database initialization failed.")
+        return
 
     cursor = conn.cursor()
 
-    # BOOKINGS TABLE
+   # BOOKINGS TABLE
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS bookings (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -44,11 +44,11 @@ def init():
         phone VARCHAR(20),
         service VARCHAR(255),
         booking_date DATE,
+        language VARCHAR(10) DEFAULT 'en',
         status VARCHAR(50) DEFAULT 'Pending',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
-    """)
-
+""")
     # ADMIN TABLE
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS admin (
@@ -66,6 +66,28 @@ def init():
         bot_reply TEXT
     )
     """)
+
+  # DEMOS TABLE
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS demos (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        language VARCHAR(20) NOT NULL,
+        category VARCHAR(50) NOT NULL DEFAULT 'general',
+        video_url TEXT NOT NULL,
+        is_new BOOLEAN DEFAULT TRUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    # Add columns introduced after the original demos table was created.
+    cursor.execute("SHOW COLUMNS FROM demos LIKE 'category'")
+    if cursor.fetchone() is None:
+        cursor.execute("""
+            ALTER TABLE demos
+            ADD COLUMN category VARCHAR(50) NOT NULL DEFAULT 'general'
+            AFTER language
+        """)
 
     # CREATE ADMIN USER
     admin_username = os.getenv("ADMIN_USERNAME")

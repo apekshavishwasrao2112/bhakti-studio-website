@@ -1,0 +1,1050 @@
+<!-- ================= ADMIN AI CHATBOT ================= -->
+
+<div id="adminChatButton">
+
+    <img
+        src="{{ url_for('static', filename='images/LogoBhakti.png') }}"
+        alt="AI Assistant"
+    >
+
+</div>
+
+
+<div id="adminChatBox">
+
+    <!-- HEADER -->
+
+    <div id="adminChatHeader">
+
+        <div class="admin-ai-title">
+
+            <span>●</span>
+            AI Assistant
+
+        </div>
+
+        <button
+            id="adminChatClose"
+            type="button">
+            ×
+        </button>
+
+    </div>
+
+
+    <!-- MESSAGES -->
+
+    <div id="adminChatMessages">
+
+        <div class="adminBotMessage">
+
+            <div class="adminMessageBubble">
+
+                नमस्कार! 👋
+
+                <br><br>
+
+                मी तुमचा Studio Admin Assistant आहे.
+
+                <br><br>
+
+                तुम्ही <strong>+</strong> बटन वापरून
+                studio related काम करू शकता.
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- INPUT AREA -->
+
+    <div id="adminChatInputArea">
+
+        <!-- PLUS BUTTON -->
+
+        <button
+            id="adminPlusBtn"
+            type="button">
+            +
+        </button>
+
+
+        <!-- QUICK ACTIONS -->
+
+        <div id="adminQuickActions">
+
+            <button
+                type="button"
+                class="quickAction"
+                onclick="selectDemo('marathi')">
+
+                🎧 Marathi Demo
+
+            </button>
+
+
+            <button
+                type="button"
+                class="quickAction"
+                onclick="selectDemo('hindi')">
+
+                🎧 Hindi Demo
+
+            </button>
+
+
+            <button
+                type="button"
+                class="quickAction"
+                onclick="sendQuickCommand('bookings दाखव')">
+
+                📅 Bookings
+
+            </button>
+
+
+            <button
+                type="button"
+                class="quickAction"
+                onclick="sendQuickCommand('pending bookings दाखव')">
+
+                ⏳ Pending Bookings
+
+            </button>
+
+        </div>
+
+
+        <!-- INPUT -->
+
+        <input
+            type="text"
+            id="adminUserInput"
+            placeholder="Command किंवा YouTube link..."
+            autocomplete="off"
+        >
+
+
+        <!-- SEND -->
+
+        <button
+            id="adminSendBtn"
+            type="button">
+
+            ➤
+
+        </button>
+
+    </div>
+
+</div>
+
+
+<style>
+
+/* =====================================================
+   CHAT BUTTON
+===================================================== */
+
+#adminChatButton {
+
+    position: fixed;
+
+    right: 25px;
+    bottom: 25px;
+
+    width: 72px;
+    height: 72px;
+
+    z-index: 99999;
+
+    cursor: pointer;
+
+    background: transparent;
+
+    border: none;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    animation: adminLogoPulse 1.8s infinite;
+
+}
+
+
+#adminChatButton img {
+
+    width: 65px;
+    height: 65px;
+
+    object-fit: contain;
+
+    display: block;
+
+}
+
+
+/* =====================================================
+   LOGO BLINK
+===================================================== */
+
+@keyframes adminLogoPulse {
+
+    0% {
+
+        filter:
+            drop-shadow(
+                0 0 0
+                rgba(37,99,235,0.2)
+            );
+
+        transform: scale(1);
+
+    }
+
+    50% {
+
+        filter:
+            drop-shadow(
+                0 0 14px
+                rgba(37,99,235,0.8)
+            );
+
+        transform: scale(1.06);
+
+    }
+
+    100% {
+
+        filter:
+            drop-shadow(
+                0 0 0
+                rgba(37,99,235,0.2)
+            );
+
+        transform: scale(1);
+
+    }
+
+}
+
+
+/* =====================================================
+   CHAT BOX
+===================================================== */
+
+#adminChatBox {
+
+    display: none;
+
+    position: fixed;
+
+    right: 25px;
+    bottom: 110px;
+
+    width: 360px;
+
+    max-width: calc(100vw - 30px);
+
+    height: 500px;
+
+    background: #ffffff;
+
+    border-radius: 18px;
+
+    overflow: hidden;
+
+    z-index: 99998;
+
+    box-shadow:
+        0 20px 60px
+        rgba(0,0,0,0.35);
+
+    border: 1px solid #e5e7eb;
+
+    font-family:
+        "Segoe UI",
+        "Noto Sans Devanagari",
+        Arial,
+        sans-serif;
+
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+#adminChatHeader {
+
+    height: 62px;
+
+    padding: 0 18px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    background: #ffffff;
+
+    border-bottom:
+        1px solid #e5e7eb;
+
+}
+
+
+.admin-ai-title {
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    color: #2563eb;
+
+}
+
+
+.admin-ai-title span {
+
+    font-size: 10px;
+
+    color: #22c55e;
+
+    margin-right: 7px;
+
+}
+
+
+#adminChatClose {
+
+    border: none;
+
+    background: transparent;
+
+    font-size: 27px;
+
+    color: #64748b;
+
+    cursor: pointer;
+
+}
+
+
+#adminChatClose:hover {
+
+    color: #111827;
+
+}
+
+
+/* =====================================================
+   MESSAGES
+===================================================== */
+
+#adminChatMessages {
+
+    height: calc(100% - 125px);
+
+    overflow-y: auto;
+
+    padding: 18px;
+
+    background: #f8fafc;
+
+}
+
+
+/* BOT */
+
+.adminBotMessage {
+
+    display: flex;
+
+    justify-content: flex-start;
+
+    margin-bottom: 14px;
+
+}
+
+
+.adminMessageBubble {
+
+    max-width: 85%;
+
+    background: #ffffff;
+
+    color: #1e293b;
+
+    padding: 12px 15px;
+
+    border-radius:
+        14px 14px 14px 4px;
+
+    border:
+        1px solid #e2e8f0;
+
+    line-height: 1.6;
+
+    font-size: 14px;
+
+}
+
+
+/* USER */
+
+.adminUserMessage {
+
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-bottom: 14px;
+
+}
+
+
+.adminUserBubble {
+
+    max-width: 85%;
+
+    background: #2563eb;
+
+    color: white;
+
+    padding: 12px 15px;
+
+    border-radius:
+        14px 14px 4px 14px;
+
+    line-height: 1.6;
+
+    font-size: 14px;
+
+    word-break: break-word;
+
+}
+
+
+/* =====================================================
+   INPUT AREA
+===================================================== */
+
+#adminChatInputArea {
+
+    position: relative;
+
+    height: 63px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 10px;
+
+    background: white;
+
+    border-top:
+        1px solid #e5e7eb;
+
+}
+
+
+/* =====================================================
+   PLUS BUTTON
+===================================================== */
+
+#adminPlusBtn {
+
+    width: 42px;
+
+    height: 42px;
+
+    border:
+        1px solid #dbe1e8;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #2563eb;
+
+    font-size: 25px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+#adminPlusBtn:hover {
+
+    background: #eff6ff;
+
+    border-color: #2563eb;
+
+}
+
+
+/* =====================================================
+   QUICK ACTION MENU
+===================================================== */
+
+#adminQuickActions {
+
+    display: none;
+
+    position: absolute;
+
+    left: 10px;
+
+    bottom: 68px;
+
+    width: 200px;
+
+    padding: 8px;
+
+    background: #ffffff;
+
+    border:
+        1px solid #e5e7eb;
+
+    border-radius: 12px;
+
+    box-shadow:
+        0 12px 30px
+        rgba(0,0,0,0.15);
+
+    z-index: 100000;
+
+}
+
+
+/* QUICK BUTTON */
+
+.quickAction {
+
+    width: 100%;
+
+    border: none;
+
+    background: transparent;
+
+    text-align: left;
+
+    padding: 10px 11px;
+
+    border-radius: 8px;
+
+    font-size: 13px;
+
+    color: #1e293b;
+
+    cursor: pointer;
+
+}
+
+
+.quickAction:hover {
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+}
+
+
+/* =====================================================
+   INPUT
+===================================================== */
+
+#adminUserInput {
+
+    flex: 1;
+
+    height: 42px;
+
+    border:
+        1px solid #dbe1e8;
+
+    border-radius: 10px;
+
+    padding: 0 13px;
+
+    outline: none;
+
+    font-size: 14px;
+
+}
+
+
+#adminUserInput:focus {
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(37,99,235,0.10);
+
+}
+
+
+/* =====================================================
+   SEND BUTTON
+===================================================== */
+
+#adminSendBtn {
+
+    width: 44px;
+
+    height: 42px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    transition: 0.2s;
+
+}
+
+
+#adminSendBtn:hover {
+
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 576px) {
+
+    #adminChatBox {
+
+        right: 15px;
+
+        bottom: 95px;
+
+        width:
+            calc(100vw - 30px);
+
+        height: 470px;
+
+    }
+
+
+    #adminChatButton {
+
+        right: 15px;
+
+        bottom: 15px;
+
+    }
+
+}
+
+</style>
+
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+
+    /* =================================================
+       ELEMENTS
+    ================================================= */
+
+    const chatButton =
+        document.getElementById(
+            "adminChatButton"
+        );
+
+
+    const chatBox =
+        document.getElementById(
+            "adminChatBox"
+        );
+
+
+    const closeButton =
+        document.getElementById(
+            "adminChatClose"
+        );
+
+
+    const input =
+        document.getElementById(
+            "adminUserInput"
+        );
+
+
+    const sendButton =
+        document.getElementById(
+            "adminSendBtn"
+        );
+
+
+    const messages =
+        document.getElementById(
+            "adminChatMessages"
+        );
+
+
+    const plusButton =
+        document.getElementById(
+            "adminPlusBtn"
+        );
+
+
+    const quickActions =
+        document.getElementById(
+            "adminQuickActions"
+        );
+
+
+    /* =================================================
+       OPEN CHAT
+    ================================================= */
+
+    chatButton.addEventListener(
+        "click",
+        function () {
+
+            chatBox.style.display =
+                "block";
+
+            input.focus();
+
+        }
+    );
+
+
+    /* =================================================
+       CLOSE CHAT
+    ================================================= */
+
+    closeButton.addEventListener(
+        "click",
+        function () {
+
+            chatBox.style.display =
+                "none";
+
+            quickActions.style.display =
+                "none";
+
+        }
+    );
+
+
+    /* =================================================
+       PLUS MENU
+    ================================================= */
+
+    plusButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                quickActions.style.display
+                === "block"
+            ) {
+
+                quickActions.style.display =
+                    "none";
+
+            } else {
+
+                quickActions.style.display =
+                    "block";
+
+            }
+
+        }
+    );
+
+
+    /* =================================================
+       SEND BUTTON
+    ================================================= */
+
+    sendButton.addEventListener(
+        "click",
+        sendAdminMessage
+    );
+
+
+    /* =================================================
+       ENTER
+    ================================================= */
+
+    input.addEventListener(
+        "keydown",
+        function (event) {
+
+            if (event.key === "Enter") {
+
+                event.preventDefault();
+
+                sendAdminMessage();
+
+            }
+
+        }
+    );
+
+
+    /* =================================================
+       MARATHI / HINDI DEMO
+    ================================================= */
+
+    window.selectDemo =
+        function (language) {
+
+            quickActions.style.display =
+                "none";
+
+
+            if (language === "marathi") {
+
+                input.value =
+                    "ही नवीन मराठी डेमो आहे, ही लिंक add कर ";
+
+            }
+
+
+            if (language === "hindi") {
+
+                input.value =
+                    "यह नई हिंदी डेमो है, यह लिंक add करो ";
+
+            }
+
+
+            input.focus();
+
+        };
+
+
+    /* =================================================
+       QUICK COMMAND
+    ================================================= */
+
+    window.sendQuickCommand =
+        function (command) {
+
+            quickActions.style.display =
+                "none";
+
+            input.value = command;
+
+            sendAdminMessage();
+
+        };
+
+
+    /* =================================================
+       SEND ADMIN MESSAGE
+    ================================================= */
+
+    function sendAdminMessage() {
+
+        const message =
+            input.value.trim();
+
+
+        if (!message) {
+
+            return;
+
+        }
+
+
+        /* USER MESSAGE */
+
+        messages.innerHTML += `
+
+            <div class="adminUserMessage">
+
+                <div class="adminUserBubble">
+
+                    ${escapeHtml(message)}
+
+                </div>
+
+            </div>
+
+        `;
+
+
+        input.value = "";
+
+
+        /* TYPING */
+
+        const typing =
+            document.createElement("div");
+
+
+        typing.className =
+            "adminBotMessage";
+
+
+        typing.innerHTML = `
+
+            <div class="adminMessageBubble">
+
+                Typing...
+
+            </div>
+
+        `;
+
+
+        messages.appendChild(typing);
+
+
+        messages.scrollTop =
+            messages.scrollHeight;
+
+
+        /* SEND TO FLASK */
+
+        fetch(
+            "/admin-ai-chat",
+            {
+
+                method: "POST",
+
+                headers: {
+
+                    "Content-Type":
+                        "application/json"
+
+                },
+
+                body: JSON.stringify({
+
+                    message: message
+
+                })
+
+            }
+        )
+
+        .then(
+            response => {
+
+                return response.json().then(data => {
+                    if (!response.ok) {
+                        throw new Error(data.reply || "Server error");
+                    }
+                    return data;
+                });
+
+            }
+        )
+
+        .then(
+            data => {
+
+                typing.remove();
+
+
+                messages.innerHTML += `
+
+                    <div class="adminBotMessage">
+
+                        <div class="adminMessageBubble">
+
+                            ${data.reply}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                messages.scrollTop =
+                    messages.scrollHeight;
+
+            }
+        )
+
+        .catch(
+            error => {
+
+                typing.remove();
+
+
+                messages.innerHTML += `
+
+                    <div class="adminBotMessage">
+
+                        <div class="adminMessageBubble">
+
+                            ⚠️ ${escapeHtml(error.message)}
+
+                        </div>
+
+                    </div>
+
+                `;
+
+
+                console.error(error);
+
+            }
+        );
+
+    }
+
+
+    /* =================================================
+       ESCAPE HTML
+    ================================================= */
+
+    function escapeHtml(text) {
+
+        const div =
+            document.createElement(
+                "div"
+            );
+
+        div.textContent =
+            text;
+
+        return div.innerHTML;
+
+    }
+
+
+});
+
+</script>

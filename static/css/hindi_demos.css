@@ -1,0 +1,177 @@
+/* =====================================================
+   HINDI BOOKING CTA
+===================================================== */
+
+.hindi-booking-section {
+    width: 100%;
+    margin-top: 70px;
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.hindi-booking-content {
+    width: 100%;
+    max-width: 850px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+
+    padding: 28px 32px;
+
+    background: rgba(255, 255, 255, 0.07);
+
+    border: 1px solid rgba(255, 193, 7, 0.25);
+
+    border-radius: 14px;
+
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+
+    transition: all 0.3s ease;
+}
+
+.hindi-booking-content:hover {
+    border-color: rgba(255, 193, 7, 0.55);
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+
+/* ================= ICON ================= */
+
+.booking-icon {
+    width: 58px;
+    height: 58px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255, 193, 7, 0.12);
+
+    border: 1px solid rgba(255, 193, 7, 0.35);
+
+    border-radius: 50%;
+
+    font-size: 25px;
+}
+
+
+/* ================= TEXT ================= */
+
+.booking-text {
+    flex: 1;
+}
+
+.booking-text h3 {
+    margin: 0 0 6px;
+
+    color: #ffffff;
+
+    font-size: 20px;
+    font-weight: 600;
+
+    letter-spacing: 0.3px;
+}
+
+.booking-text p {
+    margin: 0;
+
+    color: rgba(255, 255, 255, 0.65);
+
+    font-size: 14px;
+
+    line-height: 1.5;
+}
+
+
+/* ================= BUTTON ================= */
+
+.hindi-booking-btn {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 18px;
+
+    min-width: 230px;
+
+    padding: 14px 20px;
+
+    background: #c72c17;
+
+    border: 1px solid rgba(255, 255, 255, 0.25);
+
+    border-radius: 8px;
+
+    color: #ffffff;
+
+    text-decoration: none;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    letter-spacing: 0.3px;
+
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+
+    transition: all 0.25s ease;
+}
+
+.hindi-booking-btn:hover {
+    background: #e03b23;
+
+    color: #ffffff;
+
+    transform: translateY(-2px);
+
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.45);
+}
+
+
+/* ================= ARROW ================= */
+
+.booking-arrow {
+    font-size: 21px;
+
+    color: rgba(255, 255, 255, 0.75);
+
+    transition: transform 0.25s ease;
+}
+
+.hindi-booking-btn:hover .booking-arrow {
+    transform: translateX(5px);
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
+
+    .hindi-booking-content {
+        flex-direction: column;
+
+        text-align: center;
+
+        padding: 28px 20px;
+    }
+
+    .booking-text {
+        width: 100%;
+    }
+
+    .hindi-booking-btn {
+        width: 100%;
+        max-width: 320px;
+    }
+}

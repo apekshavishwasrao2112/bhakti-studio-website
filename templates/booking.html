@@ -1,118 +1,699 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Booking - Bhakti Studio</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.ico.png') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/booking.css') }}">
+
+    <title id="pageTitle">Booking - Bhakti Studio</title>
+
+    <link rel="icon" type="image/png"
+        href="{{ url_for('static', filename='images/favicon.ico.png') }}">
+
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/booking.css') }}">
 </head>
+
 <body>
-    <!-- Video Background -->
+
+    <!-- ================= VIDEO BACKGROUND ================= -->
+
     <div class="video-background">
-        <video autoplay muted loop class="bg-video">
-            <source src="{{ url_for('static', filename='videos/music.mp4') }}" type="video/mp4">
+        <video autoplay muted loop playsinline class="bg-video">
+            <source src="{{ url_for('static', filename='videos/music.mp4') }}"
+                type="video/mp4">
         </video>
+
+        <div class="video-overlay"></div>
     </div>
 
-    <!-- Success Message Modal -->
-    <div id="successModal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <div class="success-icon">✅</div>
-            <h2>Booking Successful!</h2>
-            <p>Your booking has been confirmed. We'll contact you soon!</p>
-            <button onclick="redirectToHome()" class="home-btn">Back to Home</button>
-        </div>
-    </div>
 
-    <!-- Booking Form Container -->
-    <div class="booking-container">
+    <!-- ================= BACK BUTTON ================= -->
+
+    <a href="/logo" class="back-home">
+        ← <span id="backText">Back to Home</span>
+    </a>
+
+
+    <!-- ================= BOOKING CONTAINER ================= -->
+
+    <main class="booking-container">
+
         <div class="blur-form">
-            <h2 id="title">🎵 Book Your Session</h2>
 
-            <!-- Language Buttons -->
+            <!-- Music Icon -->
+
+            <div class="music-icon">
+                🎙️
+            </div>
+
+
+            <!-- TITLE -->
+
+            <h2 id="title">
+                Book Your Studio Session
+            </h2>
+
+            <p id="subtitle" class="subtitle">
+                Choose your language and fill in your booking details.
+            </p>
+
+
+            <!-- ================= LANGUAGE BUTTONS ================= -->
+
             <div class="lang-buttons">
-                <button class="lang-btn active" onclick="setLang('en')">English</button>
-                <button class="lang-btn" onclick="setLang('mr')">मराठी</button>
+
+                <button
+                    type="button"
+                    class="lang-btn active"
+                    data-lang="en"
+                    onclick="setLang('en', this)">
+                    English
+                </button>
+
+                <button
+                    type="button"
+                    class="lang-btn"
+                    data-lang="mr"
+                    onclick="setLang('mr', this)">
+                    मराठी
+                </button>
+
+                <button
+                    type="button"
+                    class="lang-btn"
+                    data-lang="hi"
+                    onclick="setLang('hi', this)">
+                    हिन्दी
+                </button>
+
             </div>
-                
-            {% if request.args.get('success') == 'true' %}
-            <div style="background:green;color:white;padding:12px;border-radius:8px;margin-bottom:15px;">
-                Booking Submitted Successfully!
-            </div>
-            {% endif %}
-            <form id="bookingForm" method="POST" action="/booking">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                
-                <div class="form-group">
-                    <input type="text" name="name" id="name" placeholder="Your Name" required>
-                </div>
+
+
+            <!-- ================= FLASH MESSAGE ================= -->
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% if messages %}
+
+                    {% for category, message in messages %}
+
+                        <div class="flash-message {{ category }}">
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                {% endif %}
+
+            {% endwith %}
+
+
+            <!-- ================= BOOKING FORM ================= -->
+
+            <form id="bookingForm"
+                  method="POST"
+                  action="/booking">
+
+                <input type="hidden"
+                       name="csrf_token"
+                       value="{{ csrf_token() }}">
+
+                <!-- Selected language -->
+
+                <input type="hidden"
+                       name="language"
+                       id="language"
+                       value="en">
+
+
+                <!-- NAME -->
 
                 <div class="form-group">
-                    <input type="tel" name="phone" id="phone" placeholder="Mobile Number"  pattern="[0-9]{10}" maxlength="10" required>
+
+                    <label for="name" id="nameLabel">
+                        Your Name
+                    </label>
+
+                    <input
+                        type="text"
+                        name="name"
+                        id="name"
+                        placeholder="Enter your name"
+                        required>
+
                 </div>
 
+
+                <!-- PHONE -->
+
                 <div class="form-group">
-                    <select name="service" id="service">
-                        <option class="op" value="">Select Service</option>
-                        <option class="op" value="song">🎵 Song Recording</option>
-                        <option class="op" value="reel">🎬 Video Reel</option>
-                        <option class="op" value="announcement">📣 Announcement</option>
+
+                    <label for="phone" id="phoneLabel">
+                        Mobile Number
+                    </label>
+
+                    <input
+                        type="tel"
+                        name="phone"
+                        id="phone"
+                        placeholder="Enter 10-digit mobile number"
+                        pattern="[0-9]{10}"
+                        maxlength="10"
+                        inputmode="numeric"
+                        required>
+
+                </div>
+
+
+                <!-- SERVICE -->
+
+                <div class="form-group">
+
+                    <label for="service" id="serviceLabel">
+                        Select Service
+                    </label>
+
+                    <select
+                        name="service"
+                        id="service"
+                        required>
+
+                        <option value="" id="servicePlaceholder">
+                            Select Service
+                        </option>
+
+                        <option value="song" id="songOption">
+                            🎵 Song Recording
+                        </option>
+
+                        <option value="reel" id="reelOption">
+                            🎬 Video Reel
+                        </option>
+
+                        <option value="announcement" id="announcementOption">
+                            📣 Announcement
+                        </option>
+
                     </select>
+
                 </div>
+
+
+                <!-- DATE -->
 
                 <div class="form-group">
-                    <input type="date" name="booking_date" id="booking_date" required>
+
+                    <label for="booking_date" id="dateLabel">
+                        Select Recording Date
+                    </label>
+
+                    <input
+                        type="date"
+                        name="booking_date"
+                        id="booking_date"
+                        required>
+
                 </div>
 
-                <button type="submit" id="submitBtn" class="submit-btn">Book Now</button>
+
+                <!-- TIME -->
+
+                <div class="form-group">
+
+                    <label for="booking_time" id="timeLabel">
+                        Select Recording Time
+                    </label>
+
+                    <select
+                        name="booking_time"
+                        id="booking_time"
+                        required>
+
+                        <option value="" id="timePlaceholder">
+                            Select Time Slot
+                        </option>
+
+                        <option value="09:00">
+                            09:00 AM - 10:00 AM
+                        </option>
+
+                        <option value="10:00">
+                            10:00 AM - 11:00 AM
+                        </option>
+
+                        <option value="11:00">
+                            11:00 AM - 12:00 PM
+                        </option>
+
+                        <option value="12:00">
+                            12:00 PM - 01:00 PM
+                        </option>
+
+                        <option value="14:00">
+                            02:00 PM - 03:00 PM
+                        </option>
+
+                        <option value="15:00">
+                            03:00 PM - 04:00 PM
+                        </option>
+
+                        <option value="16:00">
+                            04:00 PM - 05:00 PM
+                        </option>
+
+                        <option value="17:00">
+                            05:00 PM - 06:00 PM
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- SUBMIT -->
+
+                <button
+                    type="submit"
+                    id="submitBtn"
+                    class="submit-btn">
+
+                    <span id="submitText">
+                        Book My Session
+                    </span>
+
+                    <span class="btn-arrow">
+                        →
+                    </span>
+
+                </button>
+
             </form>
+
         </div>
+
+    </main>
+
+
+    <!-- ================= SUCCESS MODAL ================= -->
+
+    <div id="successModal" class="modal">
+
+        <div class="modal-content">
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+            <h2 id="successTitle">
+                Booking Submitted!
+            </h2>
+
+            <p id="successMessage">
+                Your booking request has been submitted successfully.
+                We will contact you soon.
+            </p>
+
+            <button
+                onclick="redirectToHome()"
+                class="home-btn"
+                id="homeBtn">
+
+                Back to Home
+
+            </button>
+
+        </div>
+
     </div>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
 
     <script>
-        function setLang(lang) {
-            const buttons = document.querySelectorAll('.lang-btn');
-            buttons.forEach(btn => btn.classList.remove('active'));
 
-            if (lang === "mr") {
-                event.target.classList.add('active');
-                document.getElementById("title").innerText = "🎵 तुमची सत्र बुक करा";
-                document.getElementById("name").placeholder = "तुमचे नाव";
-                document.getElementById("phone").placeholder = "मोबाईल नंबर";
-            } else {
-                event.target.classList.add('active');
-                document.getElementById("title").innerText = "🎵 Book Your Session";
-                document.getElementById("name").placeholder = "Your Name";
-                document.getElementById("phone").placeholder = "Mobile Number";
+        const translations = {
+
+            en: {
+
+                title: "Book Your Studio Session",
+
+                subtitle:
+                    "Choose your language and fill in your booking details.",
+
+                back:
+                    "Back to Home",
+
+                nameLabel:
+                    "Your Name",
+
+                namePlaceholder:
+                    "Enter your name",
+
+                phoneLabel:
+                    "Mobile Number",
+
+                phonePlaceholder:
+                    "Enter 10-digit mobile number",
+
+                serviceLabel:
+                    "Select Service",
+
+                servicePlaceholder:
+                    "Select Service",
+
+                song:
+                    "🎵 Song Recording",
+
+                reel:
+                    "🎬 Video Reel",
+
+                announcement:
+                    "📣 Announcement",
+
+                dateLabel:
+                    "Select Recording Date",
+
+                timeLabel:
+                    "Select Recording Time",
+
+                timePlaceholder:
+                    "Select Time Slot",
+
+                submit:
+                    "Book My Session",
+
+                booking:
+                    "Booking...",
+
+                successTitle:
+                    "Booking Submitted!",
+
+                successMessage:
+                    "Your booking request has been submitted successfully. We will contact you soon.",
+
+                home:
+                    "Back to Home"
+
+            },
+
+
+            mr: {
+
+                title:
+                    "तुमचे स्टुडिओ सत्र बुक करा",
+
+                subtitle:
+                    "तुमची भाषा निवडा आणि बुकिंगची माहिती भरा.",
+
+                back:
+                    "मुख्यपृष्ठावर जा",
+
+                nameLabel:
+                    "तुमचे नाव",
+
+                namePlaceholder:
+                    "तुमचे नाव टाका",
+
+                phoneLabel:
+                    "मोबाईल नंबर",
+
+                phonePlaceholder:
+                    "१० अंकी मोबाईल नंबर टाका",
+
+                serviceLabel:
+                    "सेवा निवडा",
+
+                servicePlaceholder:
+                    "सेवा निवडा",
+
+                song:
+                    "🎵 गाण्याचे रेकॉर्डिंग",
+
+                reel:
+                    "🎬 व्हिडिओ रील",
+
+                announcement:
+                    "📣 उद्घोषणा",
+
+                dateLabel:
+                    "रेकॉर्डिंगची तारीख निवडा",
+
+                timeLabel:
+                    "रेकॉर्डिंगची वेळ निवडा",
+
+                timePlaceholder:
+                    "वेळ निवडा",
+
+                submit:
+                    "माझे सत्र बुक करा",
+
+                booking:
+                    "बुकिंग सुरू आहे...",
+
+                successTitle:
+                    "बुकिंग यशस्वी!",
+
+                successMessage:
+                    "तुमची बुकिंग विनंती यशस्वीरित्या पाठवली आहे. आम्ही लवकरच तुमच्याशी संपर्क करू.",
+
+                home:
+                    "मुख्यपृष्ठावर जा"
+
+            },
+
+
+            hi: {
+
+                title:
+                    "अपना स्टूडियो सेशन बुक करें",
+
+                subtitle:
+                    "अपनी भाषा चुनें और बुकिंग की जानकारी भरें।",
+
+                back:
+                    "होम पेज पर जाएँ",
+
+                nameLabel:
+                    "आपका नाम",
+
+                namePlaceholder:
+                    "अपना नाम दर्ज करें",
+
+                phoneLabel:
+                    "मोबाइल नंबर",
+
+                phonePlaceholder:
+                    "10 अंकों का मोबाइल नंबर दर्ज करें",
+
+                serviceLabel:
+                    "सेवा चुनें",
+
+                servicePlaceholder:
+                    "सेवा चुनें",
+
+                song:
+                    "🎵 गाना रिकॉर्डिंग",
+
+                reel:
+                    "🎬 वीडियो रील",
+
+                announcement:
+                    "📣 घोषणा",
+
+                dateLabel:
+                    "रिकॉर्डिंग की तारीख चुनें",
+
+                timeLabel:
+                    "रिकॉर्डिंग का समय चुनें",
+
+                timePlaceholder:
+                    "समय चुनें",
+
+                submit:
+                    "मेरा सेशन बुक करें",
+
+                booking:
+                    "बुकिंग हो रही है...",
+
+                successTitle:
+                    "बुकिंग सफल हुई!",
+
+                successMessage:
+                    "आपकी बुकिंग रिक्वेस्ट सफलतापूर्वक भेज दी गई है। हम जल्द ही आपसे संपर्क करेंगे।",
+
+                home:
+                    "होम पेज पर जाएँ"
+
             }
+
+        };
+
+
+        /* ================= LANGUAGE FUNCTION ================= */
+
+        function setLang(lang, clickedButton) {
+
+            const t = translations[lang];
+
+            if (!t) {
+                return;
+            }
+
+
+            /* Active button */
+
+            document
+                .querySelectorAll(".lang-btn")
+                .forEach(btn => {
+
+                    btn.classList.remove("active");
+
+                });
+
+            clickedButton.classList.add("active");
+
+
+            /* Save selected language */
+
+            document.getElementById("language").value = lang;
+
+
+            /* Change page language */
+
+            document.documentElement.lang = lang;
+
+
+            /* Change text */
+
+            document.getElementById("title").innerText =
+                t.title;
+
+            document.getElementById("subtitle").innerText =
+                t.subtitle;
+
+            document.getElementById("backText").innerText =
+                t.back;
+
+            document.getElementById("nameLabel").innerText =
+                t.nameLabel;
+
+            document.getElementById("name").placeholder =
+                t.namePlaceholder;
+
+            document.getElementById("phoneLabel").innerText =
+                t.phoneLabel;
+
+            document.getElementById("phone").placeholder =
+                t.phonePlaceholder;
+
+            document.getElementById("serviceLabel").innerText =
+                t.serviceLabel;
+
+            document.getElementById("servicePlaceholder").innerText =
+                t.servicePlaceholder;
+
+            document.getElementById("songOption").innerText =
+                t.song;
+
+            document.getElementById("reelOption").innerText =
+                t.reel;
+
+            document.getElementById("announcementOption").innerText =
+                t.announcement;
+
+            document.getElementById("dateLabel").innerText =
+                t.dateLabel;
+
+            document.getElementById("timeLabel").innerText =
+                t.timeLabel;
+
+            document.getElementById("timePlaceholder").innerText =
+                t.timePlaceholder;
+
+            document.getElementById("submitText").innerText =
+                t.submit;
+
+            document.getElementById("successTitle").innerText =
+                t.successTitle;
+
+            document.getElementById("successMessage").innerText =
+                t.successMessage;
+
+            document.getElementById("homeBtn").innerText =
+                t.home;
+
         }
+
+
+        /* ================= DATE VALIDATION ================= */
+
+        const dateInput =
+            document.getElementById("booking_date");
+
+        const today =
+            new Date().toISOString().split("T")[0];
+
+        dateInput.min = today;
+
+
+        /* ================= FORM SUBMISSION ================= */
+
+        document
+            .getElementById("bookingForm")
+            .addEventListener("submit", function () {
+
+                const lang =
+                    document.getElementById("language").value;
+
+                const t =
+                    translations[lang];
+
+                const submitBtn =
+                    document.getElementById("submitBtn");
+
+                submitBtn.disabled = true;
+
+                document.getElementById("submitText").innerText =
+                    t.booking;
+
+                submitBtn.classList.add("loading");
+
+            });
+
+
+        /* ================= SUCCESS MODAL ================= */
 
         function showSuccessModal() {
-            document.getElementById('successModal').style.display = 'flex';
-            setTimeout(() => {
-                document.getElementById('successModal').classList.add('show');
-            }, 100);
+
+            const modal =
+                document.getElementById("successModal");
+
+            modal.classList.add("show");
+
         }
+
 
         function redirectToHome() {
-            window.location.href = '/logo';
+
+            window.location.href = "/logo";
+
         }
 
-        // Check for success parameter in URL
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success') === 'true') {
+
+        /* ================= CHECK SUCCESS ================= */
+
+        const urlParams =
+            new URLSearchParams(window.location.search);
+
+        if (urlParams.get("success") === "true") {
+
             showSuccessModal();
+
         }
 
-        // Form submission with loading state
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
-            const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerHTML = '<span class="spinner"></span> Booking...';
-            submitBtn.disabled = true;
-        });
-    
     </script>
 
 </body>
+
 </html>
