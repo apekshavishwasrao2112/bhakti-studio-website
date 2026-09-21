@@ -18,22 +18,14 @@ def get_db_connection():
             user=os.getenv("DB_USER"),
             password=os.getenv("DB_PASSWORD"),
             database=os.getenv("DB_NAME"),
-            port=int(os.getenv("DB_PORT", "3306")),
+            port=int(os.getenv("DB_PORT", 3306)),
             connection_timeout=10
         )
 
-        if conn.is_connected():
-            return conn
-
-        print("[ERROR] MySQL connection was not established.")
-        return None
+        return conn
 
     except Error as e:
         print(f"[ERROR] MySQL connection failed: {e}")
-        return None
-
-    except ValueError as e:
-        print(f"[ERROR] Invalid DB_PORT value: {e}")
         return None
 
 
@@ -45,14 +37,12 @@ def init():
         print("[ERROR] Database initialization failed.")
         return False
 
-    cursor = None
-
     try:
+
         cursor = conn.cursor()
 
-        # ==============================
-        # BOOKINGS TABLE
-        # ==============================
+        # ================= BOOKINGS TABLE =================
+
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS bookings (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -66,9 +56,8 @@ def init():
             )
         """)
 
-        # ==============================
-        # ADMIN TABLE
-        # ==============================
+        # ================= ADMIN TABLE =================
+
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS admin (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -77,9 +66,8 @@ def init():
             )
         """)
 
-        # ==============================
-        # CHAT HISTORY TABLE
-        # ==============================
+        # ================= CHAT HISTORY TABLE =================
+
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS chat_history (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -88,9 +76,8 @@ def init():
             )
         """)
 
-        # ==============================
-        # DEMOS TABLE
-        # ==============================
+        # ================= DEMOS TABLE =================
+
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS demos (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -103,30 +90,27 @@ def init():
             )
         """)
 
-        # ==============================
-        # CHECK DEMOS CATEGORY COLUMN
-        # ==============================
+        # ================= ENSURE CATEGORY COLUMN EXISTS =================
+
         cursor.execute("SHOW COLUMNS FROM demos LIKE 'category'")
 
         if cursor.fetchone() is None:
+
             cursor.execute("""
                 ALTER TABLE demos
                 ADD COLUMN category VARCHAR(50) NOT NULL DEFAULT 'general'
                 AFTER language
             """)
 
-        # ==============================
-        # CREATE ADMIN USER
-        # ==============================
+        # ================= CREATE ADMIN USER =================
+
         admin_username = os.getenv("ADMIN_USERNAME")
         admin_password = os.getenv("ADMIN_PASSWORD")
 
-        if not admin_username or not admin_password:
-            print("[WARNING] ADMIN_USERNAME or ADMIN_PASSWORD is missing.")
-        else:
+        if admin_username and admin_password:
 
             cursor.execute(
-                "SELECT id FROM admin WHERE username = %s",
+                "SELECT id FROM admin WHERE username=%s",
                 (admin_username,)
             )
 
@@ -134,7 +118,9 @@ def init():
 
             if not existing_admin:
 
-                hashed_password = generate_password_hash(admin_password)
+                hashed_password = generate_password_hash(
+                    admin_password
+                )
 
                 cursor.execute(
                     """
@@ -144,12 +130,10 @@ def init():
                     (admin_username, hashed_password)
                 )
 
-                print("[SUCCESS] Admin user created.")
-
-        # ==============================
-        # SAVE CHANGES
-        # ==============================
         conn.commit()
+
+        cursor.close()
+        conn.close()
 
         print("[SUCCESS] MySQL Database Initialized")
 
@@ -159,24 +143,19 @@ def init():
 
         print(f"[ERROR] Database initialization error: {e}")
 
-        if conn.is_connected():
+        try:
             conn.rollback()
+        except Exception:
+            pass
 
-        return False
-
-    except Exception as e:
-
-        print(f"[ERROR] Unexpected database initialization error: {e}")
-
-        if conn.is_connected():
-            conn.rollback()
-
-        return False
-
-    finally:
-
-        if cursor is not None:
+        try:
             cursor.close()
+        except Exception:
+            pass
 
-        if conn.is_connected():
+        try:
             conn.close()
+        except Exception:
+            pass
+
+        return False
