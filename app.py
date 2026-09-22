@@ -90,6 +90,15 @@ def db_test():
 
     return "DB FAILED"
 
+@app.route("/health/db")
+def db_health():
+    conn = get_db_connection()
+    if conn is None:
+        return jsonify({"status": "unavailable", "database": "unavailable"}), 503
+
+    conn.close()
+    return jsonify({"status": "ok", "database": "connected"}), 200
+
 
 
 @app.route("/bhakti-secure-admin-portal-84729/login", methods=["GET","POST"])
@@ -121,32 +130,29 @@ def admin_login():
         try:
             cursor = conn.cursor(buffered=True)
             placeholder = get_param_style(conn)
-
             cursor.execute(
                 f"SELECT password FROM admin WHERE username = {placeholder}",
                 (username,)
             )
-
             result = cursor.fetchone()
+            cursor.close()
             conn.close()
 
             if result and check_password_hash(result[0], password):
                 session.clear()
                 session["admin"] = username
-                # Reset attempts on success
                 if client_ip in login_attempts:
                     del login_attempts[client_ip]
                 return redirect("/bhakti-secure-admin-portal-84729/dashboard")
             else:
-                # Increment attempts
                 if client_ip not in login_attempts:
                     login_attempts[client_ip] = [0, current_time]
                 login_attempts[client_ip][0] += 1
                 login_attempts[client_ip][1] = current_time
                 flash("Invalid username or password", "error")
 
-        except Exception as e:
-            print(f"Database error: {e}")
+        except Exception:
+            app.logger.exception("Admin login database query failed.")
             flash("An error occurred. Please try again.", "error")
 
     return render_template("admin_login.html")
@@ -161,86 +167,57 @@ def admin_ai_assistant():
 def admin_dashboard():
     conn = get_db_connection()
     if conn is None:
-    
-        return render_template("admin_dashboard.html",
-                             bookings=[],
-                             total_bookings=0,
-                             pending_bookings=0,
-                             confirmed_bookings=0,
-                             completed_bookings=0,
-                             db_status="Database not connected")
+        return render_template(
+            "admin_dashboard.html",
+            bookings=[],
+            total_bookings=0,
+            pending_bookings=0,
+            confirmed_bookings=0,
+            completed_bookings=0,
+            db_status="Database not connected",
+        )
 
     try:
         cursor = conn.cursor(buffered=True)
-
-     
         cursor.execute("SELECT COUNT(*) FROM bookings")
         total_bookings = cursor.fetchone()[0]
-
         cursor.execute("SELECT COUNT(*) FROM bookings WHERE status='Pending'")
         pending_bookings = cursor.fetchone()[0]
-
         cursor.execute("SELECT COUNT(*) FROM bookings WHERE status='Confirmed'")
         confirmed_bookings = cursor.fetchone()[0]
-
         cursor.execute("SELECT COUNT(*) FROM bookings WHERE status='Completed'")
         completed_bookings = cursor.fetchone()[0]
-
-      
         cursor.execute("SELECT * FROM bookings ORDER BY created_at ASC")
-        bookings_raw = cursor.fetchall()
-
         bookings = []
-
-        for b in bookings_raw:
-
-            b = list(b)
-
-            # booking structure:
-            # 0 = id
-            # 1 = name
-            # 2 = phone
-            # 3 = service
-            # 4 = booking_date
-            # 5 = language
-            # 6 = status
-            # 7 = created_at
-
-            # Format booking date
-            if b[4]:
-                if hasattr(b[4], 'strftime'):
-                    b[4] = b[4].strftime('%Y-%m-%d')
-                else:
-                    b[4] = str(b[4])
-
-            # Format created date
-            if b[7]:
-                if hasattr(b[7], 'strftime'):
-                    b[7] = b[7].strftime('%Y-%m-%d %H:%M')
-                else:
-                    b[7] = str(b[7])
-
-            bookings.append(b)
-
+        for booking_row in cursor.fetchall():
+            booking_row = list(booking_row)
+            if booking_row[4]:
+                booking_row[4] = booking_row[4].strftime("%Y-%m-%d") if hasattr(booking_row[4], "strftime") else str(booking_row[4])
+            if booking_row[7]:
+                booking_row[7] = booking_row[7].strftime("%Y-%m-%d %H:%M") if hasattr(booking_row[7], "strftime") else str(booking_row[7])
+            bookings.append(booking_row)
+        cursor.close()
         conn.close()
-
-        return render_template("admin_dashboard.html",
-                             bookings=bookings,
-                             total_bookings=total_bookings,
-                             pending_bookings=pending_bookings,
-                             confirmed_bookings=confirmed_bookings,
-                             completed_bookings=completed_bookings,
-                             db_status="Connected")
-
-    except Exception as e:
-        print(f"Database error: {e}")
-        return render_template("admin_dashboard.html",
-                             bookings=[],
-                             total_bookings=0,
-                             pending_bookings=0,
-                             confirmed_bookings=0,
-                             completed_bookings=0,
-                             db_status="Database error")
+        return render_template(
+            "admin_dashboard.html",
+            bookings=bookings,
+            total_bookings=total_bookings,
+            pending_bookings=pending_bookings,
+            confirmed_bookings=confirmed_bookings,
+            completed_bookings=completed_bookings,
+            db_status="Connected",
+        )
+    except Exception:
+        app.logger.exception("Admin dashboard database query failed.")
+        return render_template(
+            "admin_dashboard.html",
+            bookings=[],
+            total_bookings=0,
+            pending_bookings=0,
+            confirmed_bookings=0,
+            completed_bookings=0,
+            db_status="Database error",
+        )
 
 @app.route("/bhakti-secure-admin-portal-84729/logout")
 @admin_required
@@ -248,44 +225,26 @@ def admin_logout():
     session.clear()
     return redirect(url_for("admin_login"))
 
-
 @app.route("/update-status/<int:booking_id>/<status>", methods=["POST"])
 @csrf.exempt
 @admin_required
 def update_status(booking_id, status):
     conn = get_db_connection()
-
     if conn is None:
-        return jsonify({
-            "success": False,
-            "message": "Database not connected"
-        })
-
+        return jsonify({"success": False, "message": "Database not connected"}), 503
+    cursor = None
     try:
-
         cursor = conn.cursor()
-
-        cursor.execute(
-            "UPDATE bookings SET status=%s WHERE id=%s",
-            (status, booking_id)
-        )
-
+        cursor.execute("UPDATE bookings SET status=%s WHERE id=%s", (status, booking_id))
         conn.commit()
-
-        cursor.close()
-        conn.close()
-
         return jsonify({"success": True})
-
-    except Exception as e:
-
-        print("UPDATE STATUS ERROR:", e)
-
-        return jsonify({
-            "success": False,
-            "message": "Database error"
-        })
-
+    except Exception:
+        app.logger.exception("Booking status update failed.")
+        return jsonify({"success": False, "message": "Database error"}), 503
+    finally:
+        if cursor is not None:
+            cursor.close()
+        conn.close()
 
 @app.route("/bhakti-secure-admin-portal-84729/website")
 @admin_required
@@ -321,7 +280,6 @@ def admin_events():
 @admin_required
 def admin_social():
     return render_template("socialMedia.html")
-
 @app.route("/hindi-demos")
 def hindi_demos():
     return render_template("hindi_demos.html", database_demos=get_demos("hindi"))
@@ -334,6 +292,9 @@ def wel2():
 def booking():
 
     if request.method == "POST":
+
+        def booking_error(message, status_code=400):
+            return jsonify({"success": False, "message": message}), status_code
 
         # =========================
         # GET FORM DATA
@@ -365,9 +326,7 @@ def booking():
             booking_time
         ]):
 
-            flash("All fields are required.", "error")
-
-            return redirect(url_for("booking"))
+            return booking_error("All fields are required.")
 
 
         # =========================
@@ -387,12 +346,7 @@ def booking():
 
         if not re.match(r"^\d{10}$", phone):
 
-            flash(
-                "Phone must be exactly 10 digits.",
-                "error"
-            )
-
-            return redirect(url_for("booking"))
+            return booking_error("Phone must be exactly 10 digits.")
 
 
         # =========================
@@ -411,22 +365,12 @@ def booking():
 
             if booking_date < datetime.now().date():
 
-                flash(
-                    "Booking date cannot be in the past.",
-                    "error"
-                )
-
-                return redirect(url_for("booking"))
+                return booking_error("Booking date cannot be in the past.")
 
 
         except ValueError:
 
-            flash(
-                "Invalid date format.",
-                "error"
-            )
-
-            return redirect(url_for("booking"))
+            return booking_error("Invalid date format.")
 
 
         # =========================
@@ -434,100 +378,40 @@ def booking():
         # =========================
 
         conn = get_db_connection()
+        if conn is None:
+            app.logger.error("Booking rejected because MySQL is unavailable.")
+            return booking_error(
+                "Booking service is temporarily unavailable. Please try again.",
+                503,
+            )
 
-
-        if conn is not None:
-
+        cursor = None
+        try:
+            cursor = conn.cursor(buffered=True)
+            cursor.execute(
+                """
+                INSERT INTO bookings
+                (name, phone, service, booking_date, language, status)
+                VALUES (%s, %s, %s, %s, %s, %s)
+                """,
+                (name, phone, service, booking_date, language, "Pending"),
+            )
+            conn.commit()
+            return jsonify({
+                "success": True,
+                "message": "Booking submitted successfully.",
+            }), 200
+        except Exception:
             try:
-
-                cursor = conn.cursor(buffered=True)
-
-
-                # =========================
-                # SAVE BOOKING
-                # =========================
-
-                cursor.execute(
-                    """
-                    INSERT INTO bookings
-                    (
-                        name,
-                        phone,
-                        service,
-                        booking_date,
-                        language,
-                        status
-                    )
-                    VALUES
-                    (
-                        %s,
-                        %s,
-                        %s,
-                        %s,
-                        %s,
-                        %s
-                    )
-                    """,
-                    (
-                        name,
-                        phone,
-                        service,
-                        booking_date,
-                        language,
-                        "Pending"
-                    )
-                )
-
-
-                conn.commit()
-
-
+                conn.rollback()
+            except Exception:
+                pass
+            app.logger.exception("Booking INSERT or commit failed.")
+            return booking_error("Booking could not be saved. Please try again.", 503)
+        finally:
+            if cursor is not None:
                 cursor.close()
-
-                conn.close()
-
-
-                # =========================
-                # SUCCESS
-                # =========================
-
-                return redirect(
-                    url_for(
-                        "booking",
-                        success="true"
-                    )
-                )
-
-
-            except Exception as e:
-
-                print(
-                    f"Database error: {e}"
-                )
-
-                if conn:
-                    conn.close()
-
-                flash(
-                    "Error saving booking.",
-                    "error"
-                )
-
-                return redirect(
-                    url_for("booking")
-                )
-
-
-        else:
-
-            flash(
-                "Database not available.",
-                "error"
-            )
-
-            return redirect(
-                url_for("booking")
-            )
+            conn.close()
 
 
     # =========================

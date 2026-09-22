@@ -641,7 +641,9 @@
 
         document
             .getElementById("bookingForm")
-            .addEventListener("submit", function () {
+            .addEventListener("submit", async function (event) {
+
+                event.preventDefault();
 
                 const lang =
                     document.getElementById("language").value;
@@ -658,6 +660,26 @@
                     t.booking;
 
                 submitBtn.classList.add("loading");
+
+                try {
+                    const response = await fetch(this.action, {
+                        method: "POST",
+                        body: new FormData(this),
+                        headers: { "Accept": "application/json" }
+                    });
+                    const result = await response.json();
+
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.message || "Booking could not be saved.");
+                    }
+
+                    showSuccessModal();
+                } catch (error) {
+                    alert(error.message);
+                    submitBtn.disabled = false;
+                    document.getElementById("submitText").innerText = t.submit;
+                    submitBtn.classList.remove("loading");
+                }
 
             });
 
