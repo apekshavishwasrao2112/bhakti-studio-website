@@ -176,6 +176,12 @@
         <a href="#contact" style="color: var(--accent);">HIRE US</a>
     </nav>
 
+    {% if session.get('admin') %}
+    <div class="container py-2 text-end">
+        <a href="/bhakti-secure-admin-portal-84729/dashboard">← Back to Admin Dashboard</a>
+    </div>
+    {% endif %}
+
   <section id="youtube" class="parallax-section bg-studio-1">
     <div class="container">
        <div class="glass-panel" data-aos="fade-up">

@@ -176,6 +176,12 @@
     </div>
 </nav>
 
+{% if session.get('admin') %}
+<div class="container py-2 text-end">
+    <a href="/bhakti-secure-admin-portal-84729/dashboard">← Back to Admin Dashboard</a>
+</div>
+{% endif %}
+
 <div class="container py-5">
     <div class="text-center mb-5">
         <h2 class="page-title">🗳️ Election Campaign Songs</h2>

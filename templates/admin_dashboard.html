@@ -160,6 +160,7 @@
                             <th>Service</th>
                             <th>Booking Date</th>
                             <th>Language</th>
+                            <th>Booking Time</th>
                             <th>Status</th>
                             <th>Created</th>
                             <th>Actions</th>
@@ -169,7 +170,7 @@
 
 {% for booking in bookings %}
 
-<tr data-status="{{ booking[6] }}">
+<tr data-status="{{ booking[7] }}">
 
     <!-- ID -->
     <td>
@@ -205,22 +206,27 @@
         {{ booking[5] if booking[5] else 'N/A' }}
     </td>
 
+    <!-- BOOKING TIME -->
+    <td>
+        {{ booking[6] if booking[6] else 'N/A' }}
+    </td>
+
     <!-- STATUS -->
     <td>
-        <span class="status-badge status-{{ booking[6].lower() }}">
-            {{ booking[6] }}
+        <span class="status-badge status-{{ booking[7].lower() }}">
+            {{ booking[7] }}
         </span>
     </td>
 
     <!-- CREATED -->
     <td>
-        {{ booking[7] if booking[7] else 'N/A' }}
+        {{ booking[8] if booking[8] else 'N/A' }}
     </td>
 
     <!-- ACTIONS -->
     <td class="actions">
 
-        {% if booking[6] == 'Pending' %}
+        {% if booking[7] == 'Pending' %}
 
             <button
                 onclick="updateStatus(
@@ -246,7 +252,7 @@
                 Reject
             </button>
 
-        {% elif booking[6] == 'Confirmed' %}
+        {% elif booking[7] == 'Confirmed' %}
 
             <button
                 onclick="updateStatus(
@@ -260,7 +266,7 @@
                 Complete
             </button>
 
-        {% elif booking[6] == 'Completed' or booking[6] == 'Rejected' %}
+        {% elif booking[7] == 'Completed' or booking[7] == 'Rejected' %}
 
             <button
                 onclick="deleteBooking({{ booking[0] }})"
@@ -337,11 +343,11 @@
         const res = await fetch(`/update-status/${id}/${status}`, {
             method: "POST",
             headers: {
-                "X-CSRFToken": csrfToken
+                "X-CSRFToken": csrfToken,
+                "Accept": "application/json"
             }
         });
-
-        const data = await res.json();
+        const data = await parseJsonResponse(res);
 
         
         if(data.success){
@@ -356,7 +362,7 @@
     }catch(error){
 
         console.log(error);
-        alert("Server error");
+        alert(error.message || "Admin request failed.");
     }
 }
 
@@ -366,23 +372,41 @@
 
         if(!confirmDelete) return;
 
-       const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        try {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            const res = await fetch(`/delete-booking/${id}`, {
+                method: "POST",
+                headers: {
+                    "X-CSRFToken": csrfToken,
+                    "Accept": "application/json"
+                }
+            });
 
-        const res = await fetch(`/delete-booking/${id}`, {
-            method: "POST",
-            headers: {
-                "X-CSRFToken": csrfToken
+            const data = await parseJsonResponse(res);
+
+            if(data.success){
+                alert("Deleted successfully");
+                location.reload();
+            } else {
+                alert(data.message || "Unable to delete booking.");
             }
-        });
-
-        const data = await res.json();
-
-        if(data.success){
-            alert("Deleted successfully");
-            location.reload();
+        } catch (error) {
+            alert(error.message || "Admin request failed.");
         }
-    }
+        }
 
+
+        async function parseJsonResponse(response) {
+            const contentType = response.headers.get("content-type") || "";
+            if (!contentType.includes("application/json")) {
+                throw new Error("The server returned an unexpected response.");
+            }
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || data.reply || "Admin request failed.");
+            }
+            return data;
+        }
         function openRejectWhatsApp(phone, name){
 
         let cleanPhone = phone.replace(/\D/g, "");

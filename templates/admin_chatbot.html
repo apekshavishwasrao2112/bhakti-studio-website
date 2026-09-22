@@ -944,6 +944,8 @@ document.addEventListener(
                 headers: {
 
                     "Content-Type":
+                        "application/json",
+                    "Accept":
                         "application/json"
 
                 },
@@ -959,10 +961,13 @@ document.addEventListener(
 
         .then(
             response => {
-
+                const contentType = response.headers.get("content-type") || "";
+                if (!contentType.includes("application/json")) {
+                    throw new Error("The server returned an unexpected response.");
+                }
                 return response.json().then(data => {
                     if (!response.ok) {
-                        throw new Error(data.reply || "Server error");
+                        throw new Error(data.message || data.reply || "Admin request failed.");
                     }
                     return data;
                 });

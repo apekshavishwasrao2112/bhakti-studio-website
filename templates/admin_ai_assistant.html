@@ -408,11 +408,19 @@
             try {
                 const response = await fetch("/admin-ai-chat", {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json"
+                    },
                     body: JSON.stringify(payload)
                 });
-                const data = await response.json();
-                if (!response.ok) throw new Error(data.reply || "Server error");
+                const contentType = response.headers.get("content-type") || "";
+                const data = contentType.includes("application/json")
+                    ? await response.json()
+                    : { success: false, message: "The server returned an unexpected response." };
+                if (!response.ok) {
+                    throw new Error(data.message || data.reply || "Admin request failed.");
+                }
                 appendBotReply(data.reply || "");
             } catch (error) {
                 appendBotReply(`⚠️ ${escapeHtml(error.message)}`);
