@@ -261,10 +261,12 @@
                     <p>Bhakti Studio Admin Assistant</p>
                 </div>
             </div>
-            <a class="dashboard-link" href="/bhakti-secure-admin-portal-84729/dashboard">
-                <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                Admin Dashboard
-            </a>
+            {% if session.get('admin') %}
+                <a class="dashboard-link" href="/bhakti-secure-admin-portal-84729/dashboard">
+                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
+                    Admin Dashboard
+                </a>
+            {% endif %}
         </header>
 
         <section class="chat-panel">

@@ -191,10 +191,27 @@ def admin_dashboard():
         bookings = []
         for booking_row in cursor.fetchall():
             booking_row = list(booking_row)
+
+            # booking_date
             if booking_row[4]:
-                booking_row[4] = booking_row[4].strftime("%Y-%m-%d") if hasattr(booking_row[4], "strftime") else str(booking_row[4])
-            if booking_row[7]:
-                booking_row[7] = booking_row[7].strftime("%Y-%m-%d %H:%M") if hasattr(booking_row[7], "strftime") else str(booking_row[7])
+                booking_row[4] = (
+                    booking_row[4].strftime("%Y-%m-%d")
+                    if hasattr(booking_row[4], "strftime")
+                    else str(booking_row[4])
+                )
+
+            # booking_time
+            if booking_row[6]:
+                booking_row[6] = str(booking_row[6])
+
+            # created_at
+            if booking_row[8]:
+                booking_row[8] = (
+                    booking_row[8].strftime("%Y-%m-%d %H:%M")
+                    if hasattr(booking_row[8], "strftime")
+                    else str(booking_row[8])
+                )
+
             bookings.append(booking_row)
         cursor.close()
         conn.close()
@@ -288,141 +305,181 @@ def hindi_demos():
 def wel2():
     return render_template("wel2.html")
 
+
 @app.route("/booking", methods=["GET", "POST"])
 def booking():
 
     if request.method == "POST":
 
-        def booking_error(message, status_code=400):
-            return jsonify({"success": False, "message": message}), status_code
-
-        # =========================
-        # GET FORM DATA
-        # =========================
-
         name = request.form.get("name", "").strip()
-
         phone = request.form.get("phone", "").strip()
-
         service = request.form.get("service", "").strip()
-
         booking_date = request.form.get("booking_date", "").strip()
-
         language = request.form.get("language", "en").strip()
-
         booking_time = request.form.get("booking_time", "").strip()
 
-
-        # =========================
+        # -----------------------------
         # BASIC VALIDATION
-        # =========================
+        # -----------------------------
+        if not name:
+            return jsonify({
+                "success": False,
+                "message": "Name is required."
+            }), 400
 
-        if not all([
-            name,
-            phone,
-            service,
-            booking_date,
-            language,
-            booking_time
-        ]):
+        if not phone:
+            return jsonify({
+                "success": False,
+                "message": "Phone number is required."
+            }), 400
 
-            return booking_error("All fields are required.")
+        if not service:
+            return jsonify({
+                "success": False,
+                "message": "Service is required."
+            }), 400
 
+        if not booking_date:
+            return jsonify({
+                "success": False,
+                "message": "Booking date is required."
+            }), 400
 
-        # =========================
-        # LANGUAGE VALIDATION
-        # =========================
+        if not booking_time:
+            return jsonify({
+                "success": False,
+                "message": "Booking time is required."
+            }), 400
 
+        # -----------------------------
+        # LANGUAGE
+        # -----------------------------
         allowed_languages = ["en", "mr", "hi"]
 
         if language not in allowed_languages:
-
             language = "en"
 
+        # -----------------------------
+        # PHONE
+        # -----------------------------
+        if not re.fullmatch(r"\d{10}", phone):
+            return jsonify({
+                "success": False,
+                "message": "Phone must be exactly 10 digits."
+            }), 400
 
-        # =========================
-        # PHONE VALIDATION
-        # =========================
-
-        if not re.match(r"^\d{10}$", phone):
-
-            return booking_error("Phone must be exactly 10 digits.")
-
-
-        # =========================
-        # DATE VALIDATION
-        # =========================
-
+        # -----------------------------
+        # DATE
+        # -----------------------------
         try:
-
             booking_date_obj = datetime.strptime(
                 booking_date,
                 "%Y-%m-%d"
-            )
+            ).date()
 
-            booking_date = booking_date_obj.date()
-
-
-            if booking_date < datetime.now().date():
-
-                return booking_error("Booking date cannot be in the past.")
-
+            if booking_date_obj < datetime.now().date():
+                return jsonify({
+                    "success": False,
+                    "message": "Booking date cannot be in the past."
+                }), 400
 
         except ValueError:
+            return jsonify({
+                "success": False,
+                "message": "Invalid booking date."
+            }), 400
 
-            return booking_error("Invalid date format.")
-
-
-        # =========================
-        # DATABASE CONNECTION
-        # =========================
-
+        # -----------------------------
+        # DATABASE
+        # -----------------------------
         conn = get_db_connection()
+
         if conn is None:
-            app.logger.error("Booking rejected because MySQL is unavailable.")
-            return booking_error(
-                "Booking service is temporarily unavailable. Please try again.",
-                503,
-            )
+            app.logger.error("Booking failed: database connection unavailable.")
+
+            return jsonify({
+                "success": False,
+                "message": "Database connection failed."
+            }), 503
 
         cursor = None
+
         try:
-            cursor = conn.cursor(buffered=True)
+
+            cursor = conn.cursor()
+
+            # IMPORTANT:
+            # booking_time is now included in the INSERT.
             cursor.execute(
                 """
                 INSERT INTO bookings
-                (name, phone, service, booking_date, language, status)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                (
+                    name,
+                    phone,
+                    service,
+                    booking_date,
+                    language,
+                    booking_time,
+                    status
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """,
-                (name, phone, service, booking_date, language, "Pending"),
+                (
+                    name,
+                    phone,
+                    service,
+                    booking_date_obj,
+                    language,
+                    booking_time,
+                    "Pending"
+                )
             )
+
             conn.commit()
+
+            app.logger.info(
+                "Booking saved successfully for %s on %s at %s",
+                name,
+                booking_date,
+                booking_time
+            )
+
             return jsonify({
                 "success": True,
-                "message": "Booking submitted successfully.",
+                "message": "Booking submitted successfully."
             }), 200
-        except Exception:
+
+        except Exception as e:
+
             try:
                 conn.rollback()
             except Exception:
                 pass
-            app.logger.exception("Booking INSERT or commit failed.")
-            return booking_error("Booking could not be saved. Please try again.", 503)
+
+            app.logger.exception(
+                "BOOKING INSERT ERROR: %s",
+                e
+            )
+
+            return jsonify({
+                "success": False,
+                "message": "Booking could not be saved. Please try again."
+            }), 503
+
         finally:
+
             if cursor is not None:
                 cursor.close()
+
             conn.close()
 
-
-    # =========================
+    # -----------------------------
     # GET REQUEST
-    # =========================
-
+    # -----------------------------
     return render_template(
         "booking.html",
         success=request.args.get("success")
     )
-
 
 
 @app.route("/delete-booking/<int:id>", methods=["POST"])
