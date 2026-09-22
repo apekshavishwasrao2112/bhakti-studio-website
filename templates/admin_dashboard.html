@@ -7,6 +7,7 @@
     <title>Admin Dashboard - Bhakti Studio</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/favicon.ico.png') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_controls.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
@@ -397,13 +398,22 @@
 
 
         async function parseJsonResponse(response) {
+            const responseText = await response.text();
             const contentType = response.headers.get("content-type") || "";
-            if (!contentType.includes("application/json")) {
-                throw new Error("The server returned an unexpected response.");
+            let data = null;
+            if (contentType.includes("application/json")) {
+                try { data = JSON.parse(responseText); } catch (parseError) { data = null; }
             }
-            const data = await response.json();
             if (!response.ok) {
-                throw new Error(data.message || data.reply || "Admin request failed.");
+                throw new Error(
+                    (data && (data.message || data.reply))
+                    || `Admin request failed (HTTP ${response.status}, ${contentType}): ${responseText.slice(0, 240)}`
+                );
+            }
+            if (!data) {
+                throw new Error(
+                    `Admin API returned non-JSON (HTTP ${response.status}, ${contentType}): ${responseText.slice(0, 240)}`
+                );
             }
             return data;
         }

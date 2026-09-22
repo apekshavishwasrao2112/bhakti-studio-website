@@ -45,6 +45,34 @@
 
 <style>
 
+.location-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+    padding: 10px 16px;
+    border: 1px solid #e0a458;
+    border-radius: 8px;
+    background: #b84a1b;
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color .2s ease, transform .2s ease;
+}
+
+.location-btn:hover {
+    background: #d46227;
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.location-btn:focus-visible {
+    outline: 2px solid #ffd58a;
+    outline-offset: 3px;
+}
+
 /* =========================================================
    CHAT BUTTON
 ========================================================= */

@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>AI Assistant | Bhakti Studio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_controls.css') }}">
     <style>
         :root {
             --black: #000;
@@ -261,8 +263,8 @@
                     <p>Bhakti Studio Admin Assistant</p>
                 </div>
             </div>
-            {% if session.get('admin') %}
-                <a class="dashboard-link" href="/bhakti-secure-admin-portal-84729/dashboard">
+            {% if session.get('admin') and request.path.startswith('/bhakti-secure-admin-portal-84729/') %}
+                <a class="dashboard-link admin-dashboard-btn" href="/bhakti-secure-admin-portal-84729/dashboard">
                     <i class="fas fa-arrow-left" aria-hidden="true"></i>
                     Admin Dashboard
                 </a>
@@ -334,19 +336,6 @@
                     <label for="hindiUrl">YouTube Video Link</label>
                     <input id="hindiUrl" type="url" placeholder="Paste YouTube link here..." required>
                 </div>
-                <div class="field">
-                    <label for="hindiCategory">Category</label>
-                    <select id="hindiCategory">
-                        <option value="election">Election</option>
-                        <option value="campaign">Campaign</option>
-                        <option value="loudspeaker">Loudspeaker</option>
-                        <option value="production">Production</option>
-                        <option value="events">Events</option>
-                        <option value="social">Social Media</option>
-                        <option value="dialogue">Dialogue</option>
-                        <option value="general">General</option>
-                    </select>
-                </div>
                 <button class="form-button" type="submit">Add Hindi Demo</button>
             </form>
 
@@ -410,16 +399,31 @@
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        "Accept": "application/json"
+                        "Accept": "application/json",
+                        "X-CSRFToken": document.querySelector('meta[name="csrf-token"]').content
                     },
                     body: JSON.stringify(payload)
                 });
                 const contentType = response.headers.get("content-type") || "";
-                const data = contentType.includes("application/json")
-                    ? await response.json()
-                    : { success: false, message: "The server returned an unexpected response." };
+                const responseText = await response.text();
+                let data;
+                try {
+                    data = contentType.includes("application/json")
+                        ? JSON.parse(responseText)
+                        : null;
+                } catch (parseError) {
+                    data = null;
+                }
                 if (!response.ok) {
-                    throw new Error(data.message || data.reply || "Admin request failed.");
+                    throw new Error(
+                        (data && (data.message || data.reply))
+                        || `Admin request failed (HTTP ${response.status}, ${contentType}): ${responseText.slice(0, 240)}`
+                    );
+                }
+                if (!data) {
+                    throw new Error(
+                        `Admin API returned non-JSON (HTTP ${response.status}, ${contentType}): ${responseText.slice(0, 240)}`
+                    );
                 }
                 appendBotReply(data.reply || "");
             } catch (error) {
@@ -453,8 +457,7 @@
         document.getElementById("hindiForm").addEventListener("submit", event => {
             event.preventDefault();
             const url = document.getElementById("hindiUrl").value.trim();
-            const category = document.getElementById("hindiCategory").value;
-            sendToBackend({ language: "hindi", category, video_url: url }, `Hindi ${category} demo: ${url}`);
+            sendToBackend({ language: "hindi", category: "general", video_url: url }, `Hindi demo: ${url}`);
             event.target.reset();
         });
 

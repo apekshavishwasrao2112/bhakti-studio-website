@@ -652,7 +652,8 @@ def chat():
 
             <a href="https://www.google.com/maps?q=19.1138352,74.1761465"
             target="_blank"
-            rel="noopener noreferrer">
+            rel="noopener noreferrer"
+            class="location-btn">
             📍 View Location
             </a>
             """

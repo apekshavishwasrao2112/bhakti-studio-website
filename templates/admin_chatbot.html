@@ -1,5 +1,8 @@
 <!-- ================= ADMIN AI CHATBOT ================= -->
 
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_controls.css') }}">
+
 <div id="adminChatButton">
 
     <img
@@ -946,7 +949,9 @@ document.addEventListener(
                     "Content-Type":
                         "application/json",
                     "Accept":
-                        "application/json"
+                        "application/json",
+                    "X-CSRFToken":
+                        document.querySelector('meta[name="csrf-token"]').content
 
                 },
 
@@ -962,12 +967,25 @@ document.addEventListener(
         .then(
             response => {
                 const contentType = response.headers.get("content-type") || "";
-                if (!contentType.includes("application/json")) {
-                    throw new Error("The server returned an unexpected response.");
-                }
-                return response.json().then(data => {
+                return response.text().then(responseText => {
+                    let data = null;
+                    try {
+                        if (contentType.includes("application/json")) {
+                            data = JSON.parse(responseText);
+                        }
+                    } catch (parseError) {
+                        data = null;
+                    }
                     if (!response.ok) {
-                        throw new Error(data.message || data.reply || "Admin request failed.");
+                        throw new Error(
+                            (data && (data.message || data.reply))
+                            || `Admin request failed (HTTP ${response.status}, ${contentType}): ${responseText.slice(0, 240)}`
+                        );
+                    }
+                    if (!data) {
+                        throw new Error(
+                            `Admin API returned non-JSON (HTTP ${response.status}, ${contentType}): ${responseText.slice(0, 240)}`
+                        );
                     }
                     return data;
                 });
