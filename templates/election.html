@@ -177,7 +177,7 @@
 </nav>
 
 <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_controls.css') }}">
-{% if session.get('admin') and request.path.startswith('/bhakti-secure-admin-portal-84729/') %}
+{% if session.get('admin') %}
 <div class="container py-2 text-end">
     <a class="admin-dashboard-btn" href="/bhakti-secure-admin-portal-84729/dashboard">← Back to Admin Dashboard</a>
 </div>

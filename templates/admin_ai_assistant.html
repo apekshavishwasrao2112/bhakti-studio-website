@@ -349,7 +349,7 @@
                         <option value="Hindi">Hindi</option>
                     </select>
                 </div>
-                <div class="field">
+                <div class="field" id="deleteCategoryField">
                     <label for="deleteCategory">Category</label>
                     <select id="deleteCategory">
                         <option value="election">Election</option>
@@ -465,8 +465,26 @@
             event.preventDefault();
             const language = document.getElementById("deleteLanguage").value;
             const category = document.getElementById("deleteCategory").value;
-            sendToBackend({ message: `Delete the latest ${language} ${category} demo` }, `Find latest ${language} ${category} demo`);
+            const message = language === "Marathi"
+                ? `Delete the latest Marathi ${category} demo`
+                : "Delete the latest Hindi demo";
+            const displayText = language === "Marathi"
+                ? `Find latest Marathi ${category} demo`
+                : "Find latest Hindi demo";
+            sendToBackend({ message }, displayText);
         });
+
+        function updateDeleteCategoryVisibility() {
+            const isMarathi = document.getElementById("deleteLanguage").value === "Marathi";
+            document.getElementById("deleteCategoryField").hidden = !isMarathi;
+            document.getElementById("deleteCategory").disabled = !isMarathi;
+        }
+
+        document.getElementById("deleteLanguage").addEventListener(
+            "change",
+            updateDeleteCategoryVisibility
+        );
+        updateDeleteCategoryVisibility();
 
         document.getElementById("adminSendBtn").addEventListener("click", () => {
             const message = input.value.trim();
