@@ -9,6 +9,7 @@ import time
 import re
 from datetime import datetime
 from admin_ai import register_admin_chatbot
+from auth import admin_required
 
 
 
@@ -135,6 +136,7 @@ def admin_login():
             conn.close()
 
             if result and check_password_hash(result[0], password):
+                session.clear()
                 session["admin"] = username
                 # Reset attempts on success
                 if client_ip in login_attempts:
@@ -155,19 +157,13 @@ def admin_login():
     return render_template("admin_login.html")
 
 @app.route("/bhakti-secure-admin-portal-84729/ai-assistant")
+@admin_required
 def admin_ai_assistant():
-
-    if "admin" not in session:
-        return redirect("/bhakti-secure-admin-portal-84729/login")
-
     return render_template("admin_ai_assistant.html")
 
 @app.route("/bhakti-secure-admin-portal-84729/dashboard")
+@admin_required
 def admin_dashboard():
-
-    if "admin" not in session:
-        return redirect("/bhakti-secure-admin-portal-84729/login")
-
     conn = get_db_connection()
     if conn is None:
     
@@ -252,17 +248,16 @@ def admin_dashboard():
                              db_status="Database error")
 
 @app.route("/bhakti-secure-admin-portal-84729/logout")
+@admin_required
 def admin_logout():
-    session.pop("admin", None)
-    return redirect("/bhakti-secure-admin-portal-84729/login")
+    session.clear()
+    return redirect(url_for("admin_login"))
 
 
 @app.route("/update-status/<int:booking_id>/<status>", methods=["POST"])
+@csrf.exempt
+@admin_required
 def update_status(booking_id, status):
-
-    if "admin" not in session:
-        return jsonify({"success": False}) 
-
     conn = get_db_connection()
 
     if conn is None:
@@ -298,45 +293,38 @@ def update_status(booking_id, status):
 
 
 @app.route("/bhakti-secure-admin-portal-84729/website")
+@admin_required
 def admin_website():
-    if "admin" not in session:
-        return redirect("/bhakti-secure-admin-portal-84729/login")
     return redirect("/")
 
 @app.route("/bhakti-secure-admin-portal-84729/election")
+@admin_required
 def admin_election():
-    if "admin" not in session:
-        return redirect("/bhakti-secure-admin-portal-84729/login")
     return render_template("election.html")
 
 @app.route("/bhakti-secure-admin-portal-84729/campaign")
+@admin_required
 def admin_campaign():
-    if "admin" not in session:
-        return redirect("/bhakti-secure-admin-portal-84729/login")
     return render_template("campaign.html")
 
 @app.route("/bhakti-secure-admin-portal-84729/loudspeaker")
+@admin_required
 def admin_loudspeaker():
-    if "admin" not in session:
-        return redirect("/bhakti-secure-admin-portal-84729/login")
     return render_template("loudspeaker.html")
 
 @app.route("/bhakti-secure-admin-portal-84729/production")
+@admin_required
 def admin_production():
-    if "admin" not in session:
-        return redirect("/bhakti-secure-admin-portal-84729/login")
     return render_template("production.html")
 
 @app.route("/bhakti-secure-admin-portal-84729/events")
+@admin_required
 def admin_events():
-    if "admin" not in session:
-        return redirect("/bhakti-secure-admin-portal-84729/login")
     return render_template("events.html")
 
 @app.route("/bhakti-secure-admin-portal-84729/social")
+@admin_required
 def admin_social():
-    if "admin" not in session:
-        return redirect("/bhakti-secure-admin-portal-84729/login")
     return render_template("socialMedia.html")
 
 @app.route("/hindi-demos")
@@ -559,12 +547,9 @@ def booking():
 
 
 @app.route("/delete-booking/<int:id>", methods=["POST"])
+@csrf.exempt
+@admin_required
 def delete_booking(id):
-    
-
-    if "admin" not in session:
-        return jsonify({"success": False})
-
     conn = get_db_connection()
 
     if conn is None:

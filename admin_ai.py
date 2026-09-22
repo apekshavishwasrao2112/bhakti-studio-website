@@ -1,23 +1,15 @@
 import re
 from html import escape
-from flask import request, jsonify, session
+from flask import request, jsonify
 from database import get_db_connection
+from auth import admin_required
 
 
 def register_admin_chatbot(app, csrf_protect=None):
 
     @app.route("/admin-ai-chat", methods=["POST"])
+    @admin_required
     def admin_ai_chat():
-
-        # ==========================================
-        # ADMIN LOGIN CHECK
-        # ==========================================
-
-        if "admin" not in session:
-            return jsonify({
-                "reply": "⚠️ Please login to admin panel first."
-            }), 401
-
         try:
 
             data = request.get_json(silent=True)
