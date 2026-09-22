@@ -45,13 +45,14 @@ def init():
 
         # Bookings table
         cursor.execute("""
-            CREATE TABLE IF NOT EXISTS bookings (
+           CREATE TABLE IF NOT EXISTS bookings (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 name VARCHAR(255),
                 phone VARCHAR(20),
                 service VARCHAR(255),
                 booking_date DATE,
                 language VARCHAR(10) DEFAULT 'en',
+                booking_time VARCHAR(50),
                 status VARCHAR(50) DEFAULT 'Pending',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
