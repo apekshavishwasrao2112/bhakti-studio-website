@@ -6,7 +6,6 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>AI Assistant | Bhakti Studio</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_controls.css') }}">
     <style>
         :root {
             --black: #000;
@@ -67,34 +66,11 @@
             font-size: 13px;
         }
 
-        .dashboard-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--white);
-            background: #000;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 9px 13px;
-            text-decoration: none;
-            font-weight: 600;
-            white-space: nowrap;
-            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .dashboard-link:hover,
         .quick-card:hover,
         .send-button:hover,
         .form-button:hover {
             background: #242424;
         }
-
-        .dashboard-link:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28);
-        }
-
-        .dashboard-link:active { transform: translateY(0); }
 
         .chat-panel {
             margin-top: 24px;
@@ -246,7 +222,6 @@
             .assistant-header { align-items: flex-start; }
             .brand h1 { font-size: 21px; }
             .brand-logo { width: 42px; height: 42px; }
-            .dashboard-link { font-size: 13px; }
             .quick-grid { grid-template-columns: 1fr; }
             .input-bar { flex-direction: column; }
             .send-button { min-height: 42px; }
@@ -263,12 +238,6 @@
                     <p>Bhakti Studio Admin Assistant</p>
                 </div>
             </div>
-            {% if session.get('admin') and request.path.startswith('/bhakti-secure-admin-portal-84729/') %}
-                <a class="dashboard-link admin-dashboard-btn" href="/bhakti-secure-admin-portal-84729/dashboard">
-                    <i class="fas fa-arrow-left" aria-hidden="true"></i>
-                    Admin Dashboard
-                </a>
-            {% endif %}
         </header>
 
         <section class="chat-panel">

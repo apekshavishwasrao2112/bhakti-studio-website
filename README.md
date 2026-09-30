@@ -111,7 +111,7 @@ The dashboard actions are:
 - `Completed` and `Rejected` bookings can be deleted.
 - Customer phone numbers are clickable WhatsApp actions.
 
-Authenticated administrators can also open the website preview, category pages, and the admin assistant. The admin navigation includes election, campaign, loudspeaker, production, events, and social pages, plus `Back to Admin Dashboard` links where the templates provide them. Logout clears the Flask session.
+Authenticated administrators can also open the website preview, category pages, and the admin assistant. The admin navigation includes election, campaign, loudspeaker, production, events, and social pages. Logout clears the Flask session.
 
 ### Admin assistant
 

@@ -65,42 +65,6 @@
 
         .nav-overlay a:hover { color: var(--accent); }
 
-        .admin-dashboard-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            position: fixed;
-            top: 68px;
-            left: 20px;
-            z-index: 1001;
-            padding: 9px 14px;
-            border-radius: 8px;
-            background: #000;
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.86rem;
-            font-weight: 600;
-            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .admin-dashboard-link:hover {
-            background: #1c1c1c;
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28);
-        }
-
-        .admin-dashboard-link:active { transform: translateY(0); }
-
-        @media (max-width: 576px) {
-            .admin-dashboard-link {
-                top: 62px;
-                left: 12px;
-                right: 12px;
-                justify-content: center;
-            }
-        }
-
         /* Premium Glass Container */
         .glass-panel {
             background: var(--glass);
@@ -175,13 +139,6 @@
         <a href="#instagram">INSTAGRAM</a>
         <a href="#contact" style="color: var(--accent);">HIRE US</a>
     </nav>
-
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin_controls.css') }}">
-    {% if session.get('admin') %}
-    <div class="container py-2 text-end">
-        <a class="admin-dashboard-btn" href="/bhakti-secure-admin-portal-84729/dashboard">← Back to Admin Dashboard</a>
-    </div>
-    {% endif %}
 
   <section id="youtube" class="parallax-section bg-studio-1">
     <div class="container">

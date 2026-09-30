@@ -117,37 +117,6 @@
 
         .footer-logo { color: #ffc107; font-weight: bold; }
 
-        .admin-dashboard-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin: 22px 0 0;
-            padding: 9px 14px;
-            border-radius: 8px;
-            background: #000;
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.86rem;
-            font-weight: 600;
-            transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .admin-dashboard-link:hover {
-            background: #1c1c1c;
-            color: #fff;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.28);
-        }
-
-        .admin-dashboard-link:active { transform: translateY(0); }
-
-        @media (max-width: 576px) {
-            .admin-dashboard-link {
-                width: 100%;
-                justify-content: center;
-                margin-top: 16px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -175,13 +144,6 @@
         </div>
     </div>
 </nav>
-
-<link rel="stylesheet" href="{{ url_for('static', filename='css/admin_controls.css') }}">
-{% if session.get('admin') %}
-<div class="container py-2 text-end">
-    <a class="admin-dashboard-btn" href="/bhakti-secure-admin-portal-84729/dashboard">← Back to Admin Dashboard</a>
-</div>
-{% endif %}
 
                 <link rel="stylesheet" href="{{ url_for('static', filename='css/election.css') }}">
 <div class="container py-5">
