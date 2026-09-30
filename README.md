@@ -100,9 +100,9 @@ The public chatbot route is CSRF-exempt and does not require authentication. If 
 
 ## Admin Dashboard
 
-The admin area, booking mutations, and database status routes are protected by the `admin_required` decorator in `auth.py`. An unauthenticated browser request is redirected to `/bhakti-secure-admin-portal-84729/login`; an API request receives a JSON HTTP 401 response. A successful login clears the session and stores the username in `session["admin"]`.
+The project includes a protected administrator portal for managing bookings, demos, and administrative functions. The admin area, booking mutations, and database status routes are protected by the `admin_required` decorator in `auth.py`. An unauthenticated browser request is redirected to the administrator login page; an API request receives a JSON HTTP 401 response. A successful login creates a server-validated admin session.
 
-The authenticated dashboard at `/bhakti-secure-admin-portal-84729/dashboard` displays total, pending, confirmed, and completed booking counts, database status, and booking ID, name, phone, service, date, language, time, status, and creation time.
+The authenticated dashboard displays total, pending, confirmed, and completed booking counts, database status, and booking ID, name, phone, service, date, language, time, status, and creation time.
 
 The dashboard actions are:
 
@@ -115,7 +115,7 @@ Authenticated administrators can also open the website preview, category pages, 
 
 ### Admin assistant
 
-The full-page assistant in `templates/admin_ai_assistant.html` is available at `/bhakti-secure-admin-portal-84729/ai-assistant`. It is a separate admin-only system from the public customer chatbot. Its backend is registered by `register_admin_chatbot()` in `admin_ai.py` at `POST /admin-ai-chat`.
+The full-page assistant in `templates/admin_ai_assistant.html` is available only within the protected administrator portal. It is a separate admin-only system from the public customer chatbot. Its backend is registered by `register_admin_chatbot()` in `admin_ai.py` as a protected JSON endpoint.
 
 It supports keyword/command processing for:
 
@@ -126,7 +126,7 @@ It supports keyword/command processing for:
 - finding the latest matching demo for deletion
 - confirming or cancelling a demo deletion
 
-The quick-action forms send JSON directly for demo addition. Text commands are parsed with `detect_language()`, `detect_category()`, `is_booking_command()`, `detect_booking_status()`, and related helpers. Replies are JSON objects containing a `reply` value, which the admin JavaScript inserts into the assistant panel. The template includes a CSRF token header, while `register_admin_chatbot()` explicitly exempts this endpoint and `admin_required` manually protects authenticated mutating requests.
+The quick-action forms send JSON directly for demo addition. Text commands are parsed with `detect_language()`, `detect_category()`, `is_booking_command()`, `detect_booking_status()`, and related helpers. Replies are JSON objects containing a `reply` value, which the admin JavaScript inserts into the assistant panel. The template includes a CSRF token header, while the registered handler is exempted from global CSRF processing and `admin_required` enforces CSRF for authenticated mutating requests.
 
 `templates/admin_chatbot.html` contains another floating admin-chat implementation, but it is not included or referenced by the current active templates. The active admin assistant is the full-page implementation described above.
 
@@ -135,7 +135,7 @@ The quick-action forms send JSON directly for demo addition. Text commands are p
 1. A customer submits a valid form to `POST /booking`.
 2. Flask inserts the submitted values into `bookings` with status `Pending` and commits the transaction.
 3. The dashboard counts records by status and displays them to the authenticated admin.
-4. The admin dashboard sends `POST /update-status/<booking_id>/<status>` when an action is selected.
+4. The admin dashboard sends a protected request when an action is selected.
 5. The route executes `UPDATE bookings SET status=%s WHERE id=%s` and returns JSON indicating success or failure.
 6. The dashboard reloads after a successful update.
 7. Confirm, reject, and delete actions can open WhatsApp or make the corresponding database change. The status endpoint does not currently whitelist the status path value, so direct callers can submit arbitrary status strings even though the visible UI presents the normal status transitions.
@@ -234,24 +234,11 @@ The application does not contain a separate frontend framework or a separate RES
 | `GET` | `/health/db` | Return database health information | Admin session required; JSON HTTP 401 when unauthenticated |
 | `GET` | `/about` | Attempt to render `about.html` | Route exists, but `about.html` is not present in this repository |
 
-### Protected admin routes
+### Protected admin functionality
 
 | Method | Route | Purpose |
 | --- | --- | --- |
-| `GET`, `POST` | `/bhakti-secure-admin-portal-84729/login` | Validate admin credentials and create a session |
-| `GET` | `/bhakti-secure-admin-portal-84729/dashboard` | Show booking statistics and booking records |
-| `GET` | `/bhakti-secure-admin-portal-84729/ai-assistant` | Show the authenticated admin assistant |
-| `POST` | `/admin-ai-chat` | Add/delete demos or query bookings through the admin assistant |
-| `POST` | `/update-status/<int:booking_id>/<status>` | Update a booking status |
-| `POST` | `/delete-booking/<int:id>` | Delete a booking |
-| `GET` | `/bhakti-secure-admin-portal-84729/website` | Redirect the admin to `/` |
-| `GET` | `/bhakti-secure-admin-portal-84729/election` | Open protected election preview |
-| `GET` | `/bhakti-secure-admin-portal-84729/campaign` | Open protected campaign preview |
-| `GET` | `/bhakti-secure-admin-portal-84729/loudspeaker` | Open protected loudspeaker preview |
-| `GET` | `/bhakti-secure-admin-portal-84729/production` | Open protected production preview |
-| `GET` | `/bhakti-secure-admin-portal-84729/events` | Open protected events preview |
-| `GET` | `/bhakti-secure-admin-portal-84729/social` | Open protected social preview |
-| `GET` | `/bhakti-secure-admin-portal-84729/logout` | Clear the admin session |
+| Various | Protected administrator portal | Authenticate administrators; manage bookings and demos; view database status and protected previews; use the admin assistant; and log out. All management pages and APIs require an authenticated admin session. |
 
 ## Frontend to Backend to Database Flow
 
@@ -307,14 +294,14 @@ Implemented security-related behavior includes:
 - `SECRET_KEY` is loaded from the environment and used by Flask sessions.
 - Admin passwords are stored with Werkzeug `generate_password_hash()` and checked with `check_password_hash()`.
 - `admin_required` protects the dashboard, admin previews, status changes, booking deletion, and admin assistant.
-- The admin session stores only the authenticated username under `session["admin"]`.
+- Successful authentication establishes a server-validated admin session.
 - Session cookies are configured as `HttpOnly` and `SameSite=Lax`; `Secure` is enabled when `FLASK_ENV` is `production`.
 - Failed login attempts are tracked per client address, with a five-attempt lockout window of five minutes in the current process.
 - Flask-WTF `CSRFProtect` is initialized, and login, booking, and admin pages include CSRF tokens. Dashboard JavaScript sends `X-CSRFToken` headers.
 - SQL values are passed as parameters in the main booking, admin, status, deletion, and demo queries.
 - Chatbot HTML replies escape database-derived demo titles and booking values in the admin assistant.
 
-Important current limitations are also worth understanding: `/chat`, `/admin-ai-chat`, `/update-status`, and `/delete-booking` are explicitly route-level CSRF exemptions, although authenticated mutating admin requests call CSRF protection through `admin_required`. The public booking/chat endpoints have no login requirement or rate limiting. The login-attempt dictionary is process-local, and `SECRET_KEY` is required at import time. These are implementation observations, not claims of complete production security.
+Important current limitations are also worth understanding: the public chatbot and some admin mutation handlers are explicitly exempted from global CSRF processing; authenticated mutating admin requests still invoke CSRF protection through `admin_required`. The public booking/chat endpoints have no login requirement or rate limiting. The login-attempt dictionary is process-local, and `SECRET_KEY` is required at import time. These are implementation observations, not claims of complete production security.
 
 ## Deployment
 
@@ -395,7 +382,7 @@ The repository does not contain a separate test directory or frontend build syst
 
 The customer UI is a floating button and chat panel in `chatbot.html`. `sendMessage()` escapes the displayed user text, appends it to the panel, and uses `fetch("/chat", { method: "POST" })` with `JSON.stringify({ message, language })`. The Flask `chat()` function validates that a message exists, lowercases it, checks fixed keyword arrays, creates an HTML response, and attempts to insert the interaction into `chat_history`. It returns `jsonify({"reply": reply})`. The browser parses the JSON, removes the typing state, and renders the reply.
 
-The admin assistant uses the same browser/fetch/JSON pattern but targets `/admin-ai-chat` and requires the admin session. It supports structured JSON for direct demo addition and command text for booking queries and deletion. It is called “AI Assistant” in the UI, but the inspected implementation is deterministic command and keyword logic rather than an AI API integration.
+The admin assistant uses the same browser/fetch/JSON pattern through a protected endpoint and requires the admin session. It supports structured JSON for direct demo addition and command text for booking queries and deletion. It is called “AI Assistant” in the UI, but the inspected implementation is deterministic command and keyword logic rather than an AI API integration.
 
 ## How Booking Works
 
