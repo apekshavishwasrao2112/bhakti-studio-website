@@ -100,7 +100,7 @@ The public chatbot route is CSRF-exempt and does not require authentication. If 
 
 ## Admin Dashboard
 
-The admin area is protected by the `admin_required` decorator in `auth.py`. An unauthenticated browser request is redirected to `/bhakti-secure-admin-portal-84729/login`; a request expecting JSON receives HTTP 401. A successful login clears the session and stores the username in `session["admin"]`.
+The admin area, booking mutations, and database status routes are protected by the `admin_required` decorator in `auth.py`. An unauthenticated browser request is redirected to `/bhakti-secure-admin-portal-84729/login`; an API request receives a JSON HTTP 401 response. A successful login clears the session and stores the username in `session["admin"]`.
 
 The authenticated dashboard at `/bhakti-secure-admin-portal-84729/dashboard` displays total, pending, confirmed, and completed booking counts, database status, and booking ID, name, phone, service, date, language, time, status, and creation time.
 
@@ -230,8 +230,8 @@ The application does not contain a separate frontend framework or a separate RES
 | `GET` | `/social` | Show social/media content | Public HTML plus database demos |
 | `GET` | `/hindi-demos` | Show Hindi demos | Public HTML plus database demos |
 | `POST` | `/chat` | Process a customer chatbot message | Public JSON containing `reply` |
-| `GET` | `/db-test` | Check whether a database connection can be opened | Public text response |
-| `GET` | `/health/db` | Return database health information | Public JSON, HTTP 200 or 503 |
+| `GET` | `/db-test` | Check whether a database connection can be opened | Admin session required |
+| `GET` | `/health/db` | Return database health information | Admin session required; JSON HTTP 401 when unauthenticated |
 | `GET` | `/about` | Attempt to render `about.html` | Route exists, but `about.html` is not present in this repository |
 
 ### Protected admin routes

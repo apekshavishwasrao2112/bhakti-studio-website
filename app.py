@@ -81,6 +81,7 @@ class LoginForm(FlaskForm):
 
 
 @app.route("/db-test")
+@admin_required
 def db_test():
     conn = get_db_connection()
 
@@ -91,6 +92,7 @@ def db_test():
     return "DB FAILED"
 
 @app.route("/health/db")
+@admin_required
 def db_health():
     conn = get_db_connection()
     if conn is None:

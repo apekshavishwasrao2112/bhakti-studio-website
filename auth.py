@@ -8,7 +8,14 @@ def admin_required(view):
     def wrapped_view(*args, **kwargs):
         if not session.get("admin"):
             wants_json = (
-                request.path == "/admin-ai-chat"
+                request.endpoint in {
+                    "admin_ai_chat",
+                    "db_health",
+                    "delete_booking",
+                    "update_status",
+                }
+                or request.is_json
+                or request.headers.get("X-Requested-With") == "XMLHttpRequest"
                 or request.accept_mimetypes.best == "application/json"
             )
             if wants_json:
