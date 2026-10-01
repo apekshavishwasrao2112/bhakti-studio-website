@@ -2,6 +2,8 @@
 
 Bhakti Studio is a Flask-based music studio website and management system. It combines service information, Marathi/Hindi/English booking, music demos, a customer chatbot, WhatsApp communication links, MySQL storage, and an authenticated admin dashboard.
 
+**🌐 Live Project:** [Bhakti Studio](https://bhakti-studio-website-production.up.railway.app/)
+
 ## Project Overview
 
 This project came from a real business need. My brother runs a music studio, and I noticed that customer requirements, service information, demo links, bookings, and follow-up communication were being handled separately. Bhakti Studio brings those activities into one web application.
@@ -461,7 +463,6 @@ The following are future work, not current features:
 
 **Apeksha Vishwasrao**
 
-No GitHub or LinkedIn URL is included because no such link could be verified in the current project files or README context.
 
 ## Verification Notes
 
